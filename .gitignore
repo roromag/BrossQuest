@@ -1,0 +1,43 @@
+# =============================================
+# BMAD Framework files (reinstallable)
+# =============================================
+
+# Claude Code skills (BMAD installed skills)
+.claude/skills/
+
+# BMAD modules - framework files only, configs kept
+_bmad/bmb/
+_bmad/cis/
+_bmad/core/
+_bmad/tea/
+_bmad/_config/
+_bmad/_memory/
+_bmad/bmm/agents/
+_bmad/bmm/teams/
+_bmad/bmm/workflows/
+_bmad/bmm/data/
+_bmad/bmm/module-help.csv
+
+# =============================================
+# Project files to KEEP (not ignored)
+# =============================================
+# _bmad/bmm/config.yaml        ← project config
+# _bmad-output/                ← all project outputs
+# .claude/projects/            ← Claude memory
+
+# =============================================
+# OS & environment
+# =============================================
+.DS_Store
+Thumbs.db
+.env
+.env.local
+.env*.local
+
+# =============================================
+# Node / build artifacts (if app is built later)
+# =============================================
+node_modules/
+dist/
+build/
+.cache/
