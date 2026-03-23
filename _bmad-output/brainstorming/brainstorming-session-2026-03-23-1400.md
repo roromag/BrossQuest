@@ -5,8 +5,9 @@ session_topic: 'Application mobile d''aide au brossage de dents pour enfants ave
 session_goals: 'Trouver le meilleur design UX/UI, simple et accessible aux jeunes enfants'
 selected_approach: 'progressive-flow'
 techniques_used: ['What If Scenarios', 'Mind Mapping', 'SCAMPER Method', 'Solution Matrix']
-ideas_generated: 25
+ideas_generated: 26
 phase1_complete: true
+phase2_complete: true
 context_file: ''
 ---
 
@@ -200,5 +201,87 @@ PWA (web, installable sur écran d'accueil)
 ---
 
 ## Phase 2 — Reconnaissance de Patterns (Mind Mapping)
+
+**26 idées consolidées — session terminée**
+
+### Décisions structurantes
+
+**[Décision #1] : Deux clients, deux définitions du succès**
+- **Parent** → branche critique : 🎮 Le Moteur (brossage correct et régulier)
+- **Enfant** → branche critique : 📖 L'Aventure (envie de revenir, curiosité narrative)
+- Le Moteur est le **pont** entre les deux : `Désir enfant → Aventure → Moteur → Brossage correct → Satisfaction parent`
+
+**[Décision #2] : La Famille = continuité, pas contrôle**
+- Pas de tableau de bord parent séparé — éliminé
+- Pas de reporting au parent (notifications, stats de brossage)
+- Compte parent = conteneur de sauvegarde uniquement
+- La progression appartient à l'enfant, il la montre par fierté (pas le parent qui la consulte)
+
+**[Décision #3] : Le Design = séquence temporelle en 3 états**
+- Avant : narration vocale, mise en scène de l'épisode
+- Pendant : visuel progressif seul (bouche et main occupées)
+- Après : micro-célébration simple + accroche narrative
+
+---
+
+### Nouvelle idée capturée
+
+**[Design #26] : La Micro-Célébration**
+*Concept :* Animation simple et identique à la fin de chaque épisode ordinaire. Marque la complétion immédiate, récompense le geste, sans en faire trop. Distincte de `[Célébration #13]` réservée aux fins d'univers.
+*Nouveauté :* Deux niveaux de célébration calibrés — quotidien (discret) vs milestone (mémorable). Évite l'inflation de récompense.
+
+---
+
+### Mind Map complet
+
+```
+BrossQuest
+│
+├── 🎮 Le Moteur (pont entre les deux clients)
+│   ├── Détection sonore binaire (Web Audio API)
+│   ├── 3 états : brossage / voix / silence
+│   ├── Brossage = moteur narratif (pas un timer)
+│   └── Compatible manuel + électrique
+│
+├── 📖 L'Aventure (critique côté enfant)
+│   ├── Épisodes quotidiens de 2 min
+│   ├── Deux tons : matin énergisant / soir apaisant
+│   ├── Univers débloquables (progression méta)
+│   ├── Bienveillance totale — aucune pénalité
+│   └── Curiosité narrative comme moteur de retour
+│
+├── 🎨 Le Design (séquence temporelle en 3 états)
+│   ├── Avant  → narration vocale + mise en scène
+│   ├── Pendant → visuel progressif seul, une main libre
+│   ├── Après  → micro-célébration simple (quotidien)
+│   │            + célébration mémorable (fin d'univers)
+│   └── 100% pictographique, zéro texte requis
+│
+├── 👨‍👩‍👧 La Famille (continuité, pas contrôle)
+│   ├── Compte parent → conteneur de sauvegarde
+│   ├── Profils enfants → identité persistante, sans mdp
+│   └── Progression → appartient à l'enfant, partageable par lui
+│
+└── ⚙️ La Tech (implémentation du Moteur)
+    ├── PWA offline-first
+    ├── Web Audio API
+    ├── IndexedDB + Service Worker
+    └── Backend minimal (sync uniquement)
+```
+
+---
+
+### Principes de design mis à jour
+
+1. **Le brossage est le moteur** — pas un timer à surveiller
+2. **Deux clients, deux motivations** — Le Moteur sert le parent, L'Aventure sert l'enfant
+3. **Le Design est une séquence** — trois états distincts en 2-3 minutes
+4. **Deux niveaux de célébration** — quotidien (discret) et milestone (mémorable)
+5. **La Famille = confiance, pas contrôle** — pas de reporting, progression partagée par fierté
+6. **Backend minimal** — sync uniquement, pas de tracking comportemental
+
+---
+
+## Phase 3 — Développement (SCAMPER Method)
 
 _À réaliser dans un nouveau contexte — fichier de session à charger : `brainstorming-session-2026-03-23-1400.md`_
