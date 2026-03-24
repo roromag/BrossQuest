@@ -1,13 +1,19 @@
 ---
-stepsCompleted: [1, 2, 3]
+stepsCompleted: [1, 2, 3, 4]
 inputDocuments: []
 session_topic: 'Application mobile d''aide au brossage de dents pour enfants avec minuterie'
 session_goals: 'Trouver le meilleur design UX/UI, simple et accessible aux jeunes enfants'
 selected_approach: 'progressive-flow'
 techniques_used: ['What If Scenarios', 'Mind Mapping', 'SCAMPER Method', 'Solution Matrix']
-ideas_generated: 26
+ideas_generated: 44
 phase1_complete: true
 phase2_complete: true
+phase3_complete: true
+phase4_complete: true
+session_continued: true
+continuation_date: '2026-03-24'
+session_active: false
+workflow_completed: true
 context_file: ''
 ---
 
@@ -284,4 +290,273 @@ BrossQuest
 
 ## Phase 3 — Développement (SCAMPER Method)
 
-_À réaliser dans un nouveau contexte — fichier de session à charger : `brainstorming-session-2026-03-23-1400.md`_
+**10 idées + 3 contraintes supplémentaires — session terminée (2026-03-24)**
+
+### S — Substituer
+
+**[Vision #27] : Le Mode Visuel**
+*Concept :* Alternative au micro via caméra frontale. MediaPipe Hands détecte la main dans la zone bouche + mouvement oscillatoire = brossage. Traitement 100% on-device, aucune donnée transmise. Le parent choisit le mode dans les réglages (Audio par défaut / Visuel opt-in). Le positionnement est naturel : le téléphone est déjà face à l'enfant pour l'écran.
+*Nouveauté :* Élimine complètement la dépendance au son — utile pour les enfants hypersensibles au bruit, les brosses silencieuses, ou les environnements où le micro est gêné. Deux capteurs, une seule expérience enfant identique.
+
+---
+
+### C — Combiner
+
+**[Contrainte #7] : Le Principe de Non-Addition**
+*Concept :* BrossQuest ne combine pas avec d'autres routines ou apprentissages. La fenêtre d'attention de l'enfant est 100% dédiée au brossage. Tout ajout externe est un vecteur de déconcentration.
+*Principe clé :* L'app résout un seul problème. Sa valeur vient de sa profondeur sur ce problème, pas de son étendue.
+
+---
+
+### A — Adapter
+
+**[Rythme #28] : La Modulation**
+*Concept :* Pendant les 2 minutes, le rythme narratif varie intentionnellement — ralentissement pour laisser l'enfant souffler, puis accélération soudaine qui l'incite à accélérer son geste physique en miroir. Inspiré des jeux de rythme : la variation maintient l'attention mieux qu'un tempo constant.
+*Nouveauté :* Le rythme devient un outil de re-concentration actif, pas juste un fond sonore. L'enfant *sent* le changement de rythme dans sa main.
+
+**[Narration #29] : Le Guidage Narratif par Zone**
+*Concept :* Les quadrants dentaires sont intégrés dans la diégèse vocale. "On brosse les dents du haut à gauche du Dragon Malad." En parallèle, une carte dentaire discrète en coin d'écran surligne le quadrant actif — ancre visuelle qui fait le lien entre l'histoire et les vraies dents de l'enfant. La narration guide, la carte confirme.
+*Nouveauté :* Double canal (auditif + visuel) sans redondance — la narration raconte, la carte schématise. L'enfant comprend que "les dents du Dragon" = ses propres dents. Déjà validé avec Marie.
+
+**[Contrainte #8] : Densité Narrative ≠ Engagement Écran**
+*Principe :* Toute technique narrative qui attire le regard vers l'écran est contre-productive. L'enfant regarde la carte dentaire, pas l'animation principale.
+
+---
+
+### M — Modifier
+
+**[Narration #30] : L'Épisode Minuscule**
+*Concept :* Chaque épisode est structuré narrativement comme "juste un tout petit bout" — une micro-scène avec une promesse immédiate. "On a juste le temps de voir si le dragon ouvre les yeux..." L'enfant perçoit 2 minutes comme un instant fugace, pas une durée à tenir.
+*Nouveauté :* La brièveté perçue est un levier de concentration — l'enfant ne "tient pas" 2 minutes, il "finit juste ce petit bout." Cohérent avec le principe de non-distraction vers l'écran.
+
+**[Onboarding #31] : Sign-In Social**
+*Concept :* Connexion via compte Google ou Apple existant — zéro création de compte, zéro mot de passe à mémoriser. La progression est immédiatement liée à une identité cloud fiable. Multi-appareils natif dès le premier jour.
+*Nouveauté :* Réduit la friction onboarding sans différer la persistance. Le parent utilise quelque chose qu'il a déjà.
+
+**[Contrainte #9] : Onboarding Différé = Friction Amplifiée**
+*Principe :* Ne pas différer la création de compte. Le jour du changement d'appareil, la friction de reconnexion serait plus grande que celle de la création initiale.
+
+---
+
+### P — Utiliser autrement
+
+*Hors scope pour la v1 — la mécanique de détection sonore est générique mais BrossQuest reste focalisé sur le brossage.*
+
+---
+
+### É — Éliminer
+
+**[Narration #32] : La Phrase de Lancement**
+*Concept :* L'intro narrative est réduite à une seule phrase personnalisée avec le prénom. "C'est parti Lucas, on continue notre aventure pour..." — puis le brossage démarre immédiatement. Zéro histoire à écouter avant de commencer, mais un ancrage émotionnel immédiat.
+*Nouveauté :* Le prénom fait le travail de toute une intro. Implication maximale, friction minimale.
+
+**[Système #33] : Le Seuil Configurable Matin/Soir**
+*Concept :* La distinction matin/soir est 100% automatique basée sur l'heure de lancement. Seuil par défaut à 17h, modifiable par le parent. Avant 17h = session matin, après 17h = session soir. Un brossage à 14h après le déjeuner compte comme session matin — aucune pénalité, aucune confusion.
+*Nouveauté :* Résout le cas du brossage post-déjeuner sans règle arbitraire. Le parent adapte le seuil à son rythme familial. Déjà évoqué avec Marie — maintenant formalisé.
+
+**[Décision #34] : La Collection Vivante**
+*Concept :* Plusieurs univers distincts, chacun avec sa propre progression narrative indépendante. L'enfant choisit librement son univers à chaque session — médiéval aujourd'hui, maritime demain, médiéval après-demain. Chaque univers reprend exactement là où il a été laissé.
+*Nouveauté :* Pas un déblocage linéaire forcé — une collection vivante que l'enfant habite à son rythme. La liberté de choix quotidien renforce l'implication sans jamais créer de perte.
+
+---
+
+### R — Réorganiser / Inverser
+
+**[Narration #35] : L'Épisode Flashback**
+*Concept :* De temps en temps, un épisode "souvenir" — le héros revit un moment clé des épisodes passés. L'enfant reconnaît la scène, ressent l'attachement à son parcours.
+*Nouveauté :* Double bénéfice — renforce l'attachement narratif ET réduit la pression de production de nouveau contenu. Un épisode flashback = zéro nouvelle histoire à écrire.
+
+**[Onboarding #36] : L'Emoji du Héros**
+*Concept :* À l'onboarding, pendant que le parent crée le compte, l'enfant choisit un emoji associé à son prénom. Simple, visuel, immédiat. Cet emoji devient son identité dans l'app — sur l'écran de sélection de profil, dans les célébrations.
+*Nouveauté :* Premier geste de personnalisation appartient à l'enfant, pas au parent. Implication émotionnelle dès le premier lancement.
+
+---
+
+### Principes de design mis à jour
+
+1. **Le brossage est le moteur** — pas un timer à surveiller
+2. **Deux clients, deux motivations** — Le Moteur sert le parent, L'Aventure sert l'enfant
+3. **Le Design est une séquence** — trois états distincts en 2-3 minutes
+4. **Deux niveaux de célébration** — quotidien (discret) et milestone (mémorable)
+5. **La Famille = confiance, pas contrôle** — pas de reporting, progression partagée par fierté
+6. **Backend minimal** — sync uniquement, pas de tracking comportemental
+7. **Focus absolu** — BrossQuest résout un seul problème, en profondeur
+8. **Deux modes de détection** — Audio (défaut) / Visuel opt-in, même expérience enfant
+9. **Narration calibrée** — brièveté perçue, pas de tension frustrante, rythme variable
+10. **Collection vivante** — univers multiples, progression indépendante, liberté de choix quotidien
+
+---
+
+## Phase 4 — Planification (Solution Matrix)
+
+**8 idées + 3 contraintes — session terminée (2026-03-24)**
+
+### Décision fondatrice : Le Vrai Signal
+
+**[Détection #37] : Le Vrai Signal**
+*Concept :* Le mode Audio détecte la présence d'une brosse électrique allumée, pas le mouvement réel. Le mode Visuel (MediaPipe Hands) détecte le mouvement oscillatoire de la main dans la zone bouche — ce qui valide un brossage actif, pas juste un appareil en marche. C'est une différence fondamentale de ce qu'on mesure.
+*Nouveauté :* Le mode Visuel n'est pas une alternative au mode Audio — c'est la seule solution qui résout le problème réel pour les utilisateurs de brosses électriques. Un enfant peut allumer sa brosse électrique, la mettre dans la bouche et regarder l'écran sans bouger. Le Visuel seul détecte ce cas.
+
+**[Décision #38] : Visuel en V1, Audio en V2**
+*Concept :* V1 se concentre exclusivement sur la détection visuelle via MediaPipe Hands — mouvement oscillatoire de la main dans la zone bouche. C'est le cas d'usage dominant (brosse électrique) et la solution qui résout vraiment le problème. Le mode Audio (brosses manuelles) est une V2 distincte, avec ses propres défis techniques à résoudre proprement.
+*Nouveauté :* Ce n'est pas une limitation — c'est un focus. BrossQuest V1 résout un problème précis pour un public précis, sans compromis technique.
+
+---
+
+### Contrainte #10 : Le Contexte Physique
+
+**[Contrainte #10] : Le Contexte Physique**
+*Concept :* Téléphone posé sur le rebord du lavabo face au miroir. L'enfant se tient debout devant, à hauteur naturelle de l'écran. La caméra frontale capte la scène de face, à 40-70cm. MediaPipe Hands n'a pas besoin de chercher — la main qui brosse passe naturellement dans le champ.
+*Principe clé :* Le setup physique est déjà optimal. Aucune instruction de positionnement complexe n'est nécessaire — l'enfant se met là où il se met toujours.
+
+---
+
+### La Séquence de Brossage
+
+**[UX #39] : Le Lancement Sans Friction**
+*Concept :* Détection de présence via la caméra — quand un visage/une silhouette entre dans le champ, l'app propose visuellement de démarrer avec un grand bouton animé pulsant. L'enfant peut toucher l'écran ou simplement attendre 3 secondes pour que ça parte automatiquement.
+*Nouveauté :* Zéro friction de lancement pour des mains qui vont bientôt être occupées. L'app accueille l'enfant, pas l'inverse.
+
+**[UX #40] : Le Fondu de Calibration**
+*Concept :* Au lancement de la session, le flux caméra est visible 3-5 secondes — l'enfant se voit, ajuste sa position naturellement, l'app valide le cadrage (main détectable). Puis le flux s'estompe progressivement pour laisser place à l'animation. La caméra continue de tourner et détecter en arrière-plan — seul l'affichage disparaît.
+*Nouveauté :* La calibration n'est pas une étape technique contraignante — c'est un moment ludique ("tu te vois ?") avant que la magie commence. L'enfant comprend intuitivement ce qu'on attend de lui sans instruction.
+
+**[Contrainte #11] : Le Silence du Brossage**
+*Concept :* Pendant les 2 minutes actives, l'expérience est 100% visuelle. Zéro narration vocale, zéro son d'instruction. Une brosse électrique dans la bouche = oreilles partiellement masquées + risque d'arrêt pour écouter. L'audio est réservé au "Avant" (mise en scène de l'épisode) et au "Après" (micro-célébration).
+*Principe clé :* La séquence temporelle est maintenant claire : **Avant = audio + visuel / Pendant = visuel seul / Après = audio + visuel.**
+
+**[Design #41] : L'Animation Évocatrice**
+*Concept :* Les visuels des univers ne représentent jamais précisément l'objet — ils l'évoquent. Une masse sombre qui pulse légèrement = un dragon endormi. Des formes géométriques qui s'assemblent = un château. Une tache lumineuse qui grossit = une planète. Le cerveau de l'enfant complète l'image — son imagination fait le travail, l'écran ne fait que suggérer.
+*Nouveauté :* L'abstraction est une décision de design délibérée, pas un compromis technique. Ce qui est flou invite à regarder moins longtemps et à imaginer plus. L'enfant brosse, son cerveau joue.
+
+**[Design #42] : L'Animation-Guide de Zone**
+*Concept :* La forme abstraite se déplace sur l'écran pour indiquer le quadrant actif — haut gauche, haut droite, bas gauche, bas droite. Le mouvement est lent, naturel, diégétique ("le dragon tourne la tête"). Pas de carte dentaire explicite, pas de schéma — juste une présence qui migre doucement d'une zone à l'autre. L'enfant suit le mouvement avec sa brosse sans s'en rendre compte.
+*Nouveauté :* La guidance dentaire est encodée dans le comportement de l'animation, pas dans une interface séparée. Zéro charge cognitive — l'enfant imite un mouvement, il ne lit pas une instruction.
+
+---
+
+### Progression et Onboarding
+
+**[Décision #43] : Deux Niveaux de Progression**
+*Concept :* La **Collection** est le niveau méta — l'enfant choisit son univers du jour (Forêt, Océan, Espace...). La **Série** est le niveau narratif — chaque univers a sa propre séquence d'épisodes qui avance exactement là où elle a été laissée. Le choix quotidien de collection est un acte d'agentivité qui précède le brossage. La série crée l'attachement et le désir de revenir.
+*Nouveauté :* L'enfant est acteur à deux niveaux — il décide *où* il va (collection), puis il est embarqué (série). La motivation extrinsèque (choix) déclenche la motivation intrinsèque (curiosité narrative).
+
+**[Onboarding #44] : Le Passage de Main**
+*Concept :* Onboarding en une session, deux moments distincts. Moment parent : sign-in social (Google/Apple) + saisie du prénom de l'enfant — rapide, textuel, sobre. Moment enfant : l'écran bascule en mode pictographique, l'enfant choisit son emoji parmi une sélection. C'est son premier geste dans l'app, avant même le premier brossage. L'emoji est modifiable à tout moment depuis le profil — ce qui permet au parent de tester l'app seul et de faire le choix avec l'enfant plus tard.
+*Nouveauté :* Le passage de main est un rituel d'entrée. L'enfant n'hérite pas d'un compte configuré par son parent — il prend possession de son univers dès le premier instant.
+
+---
+
+### Séquence complète BrossQuest V1
+
+```
+AVANT (10-15s)
+  → App détecte la présence → bouton pulsant
+  → Narration vocale courte + animation de mise en scène
+  → "[Prénom], c'est parti — le dragon t'attend..."
+  → Flux caméra visible 3-5s (calibration naturelle)
+
+PENDANT (2 min) — VISUEL UNIQUEMENT
+  → Flux caméra s'estompe
+  → Forme abstraite évocatrice apparaît
+  → Mouvement de zone ×4 quadrants (30s chacun)
+  → Aucun son, aucune instruction
+
+APRÈS (5-10s)
+  → Micro-célébration visuelle + son de victoire
+  → Accroche narrative courte ("demain on découvre...")
+```
+
+---
+
+## Solution Matrix — Configuration V1
+
+| Dimension | Décision |
+|---|---|
+| **Détection** | Visuel (MediaPipe Hands) — défaut unique V1 |
+| **Séquence** | Avant (audio+visuel) / Pendant (visuel seul) / Après (audio+visuel) |
+| **Calibration** | Flux caméra 3-5s → fondu → animation |
+| **Animation** | Abstraite, évocatrice, mouvement de zone (4 quadrants) |
+| **Progression** | Collection (choix quotidien) + Série (épisodes séquentiels) |
+| **Onboarding** | Sign-in social → prénom → passage de main → emoji enfant |
+| **Compte** | Multi-profils enfants, emoji modifiable, progression cloud |
+| **Philosophie** | Zéro punition, zéro notification, bienveillance totale |
+| **Scope V1** | Brosse électrique, mode visuel uniquement |
+| **V2** | Mode audio (brosses manuelles) |
+
+---
+
+## Organisation thématique — Session complète (44 idées)
+
+### Thème 1 : Le Moteur de Détection
+*La décision architecturale centrale.*
+- #27 Le Mode Visuel → #37 Le Vrai Signal → #38 Visuel V1 / Audio V2
+- Contraintes #2 (brosse électrique), #10 (contexte physique lavabo)
+- **Breakthrough :** Le mode Audio ne résout pas le vrai problème (brosse allumée ≠ brossage actif). Le Visuel est le seul signal valide pour la brosse électrique.
+
+### Thème 2 : La Séquence de Brossage
+*L'expérience enfant en 3 états temporels distincts.*
+- #39 Lancement sans friction → #40 Fondu de calibration → #41 Animation évocatrice → #42 Animation-guide de zone → #26 Micro-célébration → #13 Fin de Monde
+- Contraintes #11 (silence du brossage), #8 (densité narrative ≠ engagement écran)
+- **Breakthrough :** Pendant = visuel seul. L'audio crée un conflit cognitif avec une brosse électrique en bouche.
+
+### Thème 3 : La Narration et les Univers
+*Ce qui donne envie de revenir chaque soir.*
+- #8 La Série → #9 Matin/Soir → #10 Les Mondes → #11 Deux couches indépendantes → #30 L'Épisode Minuscule → #35 L'Épisode Flashback
+- #16 Voix de l'Aventure → #29 Guidage narratif → #32 Phrase de lancement → #28 La Modulation
+- **Breakthrough :** La brièveté perçue ("juste ce petit bout") est un levier actif de concentration, pas une contrainte.
+
+### Thème 4 : La Progression et la Collection
+*Deux niveaux d'implication de l'enfant.*
+- #34 La Collection Vivante → #43 Deux niveaux de progression → #25 Changement d'univers en cours
+- #12 L'Aventure Patiente → #24 Récompense Pure → Contrainte #6 (anti-farming)
+- **Breakthrough :** Le choix quotidien de collection est un acte d'agentivité qui précède et motive le brossage.
+
+### Thème 5 : L'Architecture Famille
+*Compte, profils, onboarding.*
+- #15 Rôle du Parent → #20 Modèle Famille → #31 Sign-In Social → #36 Emoji du Héros → #44 Le Passage de Main
+- #19 Les Deux Demi-Journées → #33 Seuil configurable → Décision #2 (Famille = continuité, pas contrôle)
+- Contrainte #9 (onboarding différé = friction amplifiée)
+- **Breakthrough :** Le passage de main parent→enfant pendant l'onboarding est un rituel d'entrée — l'enfant prend possession de son univers dès le premier instant.
+
+### Thème 6 : Philosophie et Principes
+*Les règles implicites qui font que BrossQuest dure.*
+- #24 Récompense Pure, #12 Aventure Patiente, Contrainte #7 (non-addition), Contrainte #5 (zéro texte)
+- Décision #2 (Famille = continuité, pas contrôle), #17 Interface Pictographique
+
+### Thème 7 : Stack Technique
+- #23 PWA offline-first + IndexedDB + Service Worker
+- #37 MediaPipe Hands (on-device, aucune donnée transmise)
+- #33 Seuil matin/soir configurable
+
+---
+
+## Priorités V1
+
+**Top 3 — Non négociables :**
+1. **Détection visuelle (MediaPipe Hands)** — valeur différenciante absolue
+2. **Séquence Avant/Pendant/Après avec animation abstraite guidante** — l'expérience cœur
+3. **Collection + Série + Onboarding avec passage de main** — rétention et implication
+
+**Quick wins :**
+- Seuil matin/soir configurable (#33)
+- Phrase de lancement avec prénom (#32)
+- Micro-célébration discrète (#26)
+
+**Déféré en V2 :**
+- Mode Audio (brosses manuelles)
+
+---
+
+## Principes de design finaux
+
+1. **Le brossage est le moteur** — pas un timer à surveiller
+2. **Le Visuel valide le vrai geste** — brosse allumée ≠ brossage actif
+3. **Deux clients, deux motivations** — Le Moteur sert le parent, L'Aventure sert l'enfant
+4. **La séquence est sacrée** — Avant (audio+visuel) / Pendant (visuel seul) / Après (audio+visuel)
+5. **L'abstraction est intentionnelle** — évocation > représentation, imagination > distraction
+6. **Deux niveaux de progression** — Collection (agentivité) + Série (attachement narratif)
+7. **Bienveillance totale** — zéro punition, zéro notification, zéro pression
+8. **Le passage de main** — l'enfant prend possession de l'app dès l'onboarding
+9. **Focus absolu** — BrossQuest résout un seul problème, en profondeur
+10. **Backend minimal** — sync uniquement, aucun tracking comportemental
