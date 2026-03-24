@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrossQuest — Directions de Design</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-session: #1E2A3A;
+    --bg-parent: #2D3748;
+    --bg-surface: #3D4F63;
+    --text-primary: #EDF2F7;
+    --text-secondary: #A0AEC0;
+    --text-muted: #718096;
+    --anim-avant: #48BB78;
+    --anim-arriere: #2D6A4F;
+    --anim-micro: #F6AD55;
+    --accent-cyan: #76E4F7;
+    --accent-ambre: #F6AD55;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #111827;
+    color: var(--text-primary);
+    padding: 32px 16px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent-cyan);
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    margin-top: 56px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2D3748;
+  }
+
+  /* Grid of phone mockups */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--bg-parent);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid #3D4F63;
+  }
+
+  .card-label {
+    padding: 16px 20px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    border-bottom: 1px solid #3D4F63;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-label .badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: #3D4F63;
+    color: var(--text-secondary);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+  }
+
+  /* ─── PHONE FRAME ─── */
+  .phone {
+    width: 240px;
+    height: 420px;
+    margin: 24px auto;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Direction 1 : Minimal Immersif ── */
+  .d1 { background: var(--bg-session); }
+  .d1 .pulse-btn {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #76E4F7 0%, #4AADBD 60%, transparent 100%);
+    display: flex; align-items: center; justify-content: center;
+    animation: pulse 2.4s ease-in-out infinite;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(118,228,247,0.35);
+  }
+  .d1 .pulse-btn::after {
+    content: '▶';
+    font-size: 32px;
+    color: var(--bg-session);
+    margin-left: 4px;
+  }
+  .d1 .profile-chip {
+    position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .d1 .profile-chip .emoji { font-size: 20px; }
+
+  /* ── Direction 2 : Atmosphérique ── */
+  .d2 {
+    background: linear-gradient(160deg, #0D1B2A 0%, #1E2A3A 40%, #1a2535 100%);
+  }
+  .d2 .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 30px 40px, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80px 110px, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 150px 60px, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60px 200px, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 190px 180px, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 110px 310px, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20px 350px, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 200px 370px, rgba(255,255,255,0.3) 0%, transparent 100%);
+  }
+  .d2 .pulse-btn {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    border: 2px solid rgba(118,228,247,0.5);
+    display: flex; align-items: center; justify-content: center;
+    animation: pulse 2.4s ease-in-out infinite;
+    position: relative; z-index: 1;
+    background: rgba(118,228,247,0.08);
+    box-shadow: 0 0 60px rgba(118,228,247,0.2), inset 0 0 30px rgba(118,228,247,0.1);
+  }
+  .d2 .pulse-btn::after {
+    content: '▶';
+    font-size: 28px;
+    color: var(--accent-cyan);
+    margin-left: 3px;
+  }
+  .d2 .world-name {
+    position: absolute; bottom: 36px; left: 0; right: 0;
+    text-align: center; font-size: 14px; color: var(--text-secondary);
+    letter-spacing: 0.06em; z-index: 1;
+  }
+  .d2 .profile-top {
+    position: absolute; top: 20px; left: 0; right: 0;
+    text-align: center; font-size: 24px; z-index: 1;
+  }
+
+  /* ── Direction 3 : Session Pendant — 8 zones ── */
+  .d3 { background: var(--bg-session); justify-content: center; }
+  .zones-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 6px;
+    width: 180px;
+    height: 340px;
+  }
+  .zone {
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: rgba(255,255,255,0.4);
+    letter-spacing: 0.04em;
+    transition: all 0.4s ease;
+  }
+  .zone.active {
+    background: var(--anim-avant);
+    color: rgba(255,255,255,0.9);
+    box-shadow: 0 0 20px rgba(72,187,120,0.4);
+    animation: pulse-zone 1.8s ease-in-out infinite;
+  }
+  .zone.done {
+    background: rgba(72,187,120,0.15);
+    color: rgba(72,187,120,0.5);
+  }
+  .zone.back-active {
+    background: var(--anim-arriere);
+    color: rgba(255,255,255,0.7);
+    box-shadow: 0 0 20px rgba(45,106,79,0.5);
+  }
+  .zone.back-done {
+    background: rgba(45,106,79,0.2);
+    color: rgba(45,106,79,0.5);
+  }
+  .zone.pending {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  /* ── Direction 4 : Onboarding Passage de main ── */
+  .d4 { background: var(--bg-session); flex-direction: column; gap: 0; }
+  .d4 .hand-title {
+    font-size: 15px; font-weight: 700;
+    color: var(--text-primary);
+    text-align: center; padding: 0 24px;
+    line-height: 1.4; margin-bottom: 6px;
+  }
+  .d4 .hand-sub {
+    font-size: 11px; color: var(--text-muted);
+    text-align: center; margin-bottom: 24px;
+  }
+  .emoji-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; padding: 0 20px; width: 100%;
+  }
+  .emoji-item {
+    width: 48px; height: 48px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .emoji-item.selected {
+    background: rgba(118,228,247,0.15);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 16px rgba(118,228,247,0.25);
+  }
+
+  /* ── Direction 5 : Après / Micro-célébration ── */
+  .d5 { background: var(--bg-session); flex-direction: column; gap: 16px; }
+  .d5 .celebration-ring {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(246,173,85,0.3) 0%, transparent 70%);
+    border: 2px solid rgba(246,173,85,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    animation: celebrate 1s ease-out;
+  }
+  .d5 .after-text {
+    font-size: 16px; font-weight: 700;
+    color: var(--text-primary);
+    text-align: center; padding: 0 32px;
+    line-height: 1.4;
+  }
+  .d5 .after-hook {
+    font-size: 12px; color: var(--text-secondary);
+    text-align: center; padding: 0 24px;
+    line-height: 1.5; font-style: italic;
+  }
+  .d5 .after-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-cyan);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ── Direction 6 : Onboarding Parent ── */
+  .d6 {
+    background: var(--bg-parent);
+    flex-direction: column;
+    gap: 0;
+    justify-content: flex-start;
+    padding-top: 28px;
+  }
+  .d6 .ob-title {
+    font-size: 18px; font-weight: 700;
+    color: var(--text-primary);
+    text-align: center; padding: 0 20px;
+    margin-bottom: 4px;
+  }
+  .d6 .ob-sub {
+    font-size: 11px; color: var(--text-muted);
+    text-align: center; padding: 0 24px;
+    margin-bottom: 24px; line-height: 1.5;
+  }
+  .d6 .ob-field {
+    width: calc(100% - 40px);
+    background: var(--bg-surface);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-size: 14px; color: var(--text-primary);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .d6 .ob-field .field-icon { font-size: 16px; }
+  .d6 .ob-field .placeholder { color: var(--text-muted); font-size: 13px; }
+  .d6 .ob-field .value { color: var(--text-primary); font-size: 13px; }
+  .d6 .ob-btn {
+    width: calc(100% - 40px);
+    background: var(--accent-cyan);
+    color: var(--bg-session);
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 14px; font-weight: 700;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .d6 .ob-camera-note {
+    font-size: 10px; color: var(--text-muted);
+    text-align: center; padding: 10px 24px 0;
+    line-height: 1.5;
+  }
+
+  /* ── Direction 7 : Accueil profil (écran parent quotidien) ── */
+  .d7 {
+    background: var(--bg-parent);
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 20px;
+    gap: 0;
+  }
+  .d7 .home-greeting {
+    font-size: 13px; color: var(--text-muted);
+    text-align: center; margin-bottom: 4px;
+  }
+  .d7 .home-time {
+    font-size: 11px; color: var(--text-muted);
+    text-align: center; margin-bottom: 20px;
+  }
+  .d7 .profile-card {
+    width: calc(100% - 32px);
+    background: var(--bg-surface);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .d7 .profile-emoji { font-size: 48px; }
+  .d7 .profile-name {
+    font-size: 20px; font-weight: 700;
+    color: var(--text-primary);
+  }
+  .d7 .profile-streak {
+    font-size: 11px; color: var(--text-secondary);
+  }
+  .d7 .launch-btn {
+    width: calc(100% - 32px);
+    background: var(--accent-cyan);
+    color: var(--bg-session);
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 15px; font-weight: 700;
+    text-align: center;
+    margin-top: 12px;
+    box-shadow: 0 4px 20px rgba(118,228,247,0.3);
+  }
+
+  /* ── Direction 8 : Récupération permission caméra ── */
+  .d8 {
+    background: var(--bg-parent);
+    flex-direction: column;
+    gap: 0;
+    justify-content: center;
+    padding: 0 20px;
+  }
+  .d8 .perm-icon {
+    font-size: 48px; text-align: center;
+    margin-bottom: 16px;
+  }
+  .d8 .perm-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--text-primary); text-align: center;
+    margin-bottom: 8px;
+  }
+  .d8 .perm-body {
+    font-size: 11px; color: var(--text-secondary);
+    text-align: center; line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .d8 .perm-steps {
+    width: 100%;
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 20px;
+  }
+  .d8 .perm-step {
+    background: var(--bg-surface);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 11px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .d8 .perm-step .num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(118,228,247,0.15);
+    color: var(--accent-cyan);
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .d8 .perm-note {
+    font-size: 10px; color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ─── Animations ─── */
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.06); opacity: 0.85; }
+  }
+  @keyframes pulse-zone {
+    0%, 100% { box-shadow: 0 0 20px rgba(72,187,120,0.4); }
+    50% { box-shadow: 0 0 35px rgba(72,187,120,0.7); }
+  }
+  @keyframes celebrate {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ─── Description cards ─── */
+  .desc {
+    padding: 16px 20px 20px;
+    border-top: 1px solid #3D4F63;
+  }
+  .desc-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .desc-body {
+    font-size: 11px; color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .desc-tag {
+    display: inline-block;
+    margin-top: 8px; margin-right: 4px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 10px;
+    background: rgba(118,228,247,0.1);
+    color: var(--accent-cyan);
+  }
+  .desc-tag.ambre {
+    background: rgba(246,173,85,0.1);
+    color: var(--accent-ambre);
+  }
+  .desc-tag.green {
+    background: rgba(72,187,120,0.1);
+    color: var(--anim-avant);
+  }
+
+  /* ─── Color swatch row ─── */
+  .swatches {
+    display: flex; gap: 6px; padding: 16px 20px;
+    border-top: 1px solid #3D4F63;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    width: 24px; height: 24px; border-radius: 6px;
+    position: relative;
+  }
+  .swatch:hover::after {
+    content: attr(title);
+    position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+    background: #111; color: #fff; font-size: 10px;
+    padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<h1>BrossQuest — Directions de Design</h1>
+<p class="subtitle">Direction "Profondeur des mondes" · 8 écrans clés · Palette #1E2A3A</p>
+
+<p class="section-title">Écrans enfant — Session</p>
+
+<div class="grid">
+
+  <!-- D1 : Accueil / Bouton pulsant minimal -->
+  <div class="card">
+    <div class="card-label">Direction 1 — Lancement minimal <span class="badge">Enfant</span></div>
+    <div class="phone d1">
+      <div class="d1 profile-chip"><span class="emoji">⚔️</span> Lucas</div>
+      <div class="pulse-btn"></div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#1E2A3A" title="#1E2A3A"></div>
+      <div class="swatch" style="background:#76E4F7" title="accent-cyan"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Bouton pulsant centré — zéro chrome</div>
+      <div class="desc-body">Un seul élément. L'écran d'accueil enfant est réduit à l'essentiel : le profil en haut, le bouton au centre. Aucune décision, aucun texte. 1 tap = lancement.</div>
+      <span class="desc-tag">1 action</span>
+      <span class="desc-tag">Friction zéro</span>
+    </div>
+  </div>
+
+  <!-- D2 : Accueil atmosphérique -->
+  <div class="card">
+    <div class="card-label">Direction 2 — Atmosphérique <span class="badge">Enfant</span></div>
+    <div class="phone d2">
+      <div class="stars"></div>
+      <div class="d2 profile-top">⚔️</div>
+      <div class="pulse-btn"></div>
+      <div class="world-name">Épisode 12 · Le Dragon Molaire</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#0D1B2A" title="#0D1B2A deep"></div>
+      <div class="swatch" style="background:#76E4F7" title="accent-cyan"></div>
+      <div class="swatch" style="background:rgba(255,255,255,0.4)" title="étoiles"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Fond étoilé + accroche narrative visible</div>
+      <div class="desc-body">Le nom de l'épisode est visible avant le lancement — crée l'anticipation narrative. Le bouton est plus discret, enveloppé par l'ambiance du monde.</div>
+      <span class="desc-tag">Narratif</span>
+      <span class="desc-tag ambre">Anticipation</span>
+    </div>
+  </div>
+
+  <!-- D3 : Session Pendant — 8 zones -->
+  <div class="card">
+    <div class="card-label">Direction 3 — Phase Pendant · 8 zones <span class="badge">Session</span></div>
+    <div class="phone d3">
+      <div class="zones-grid">
+        <div class="zone done">HG·Av</div>
+        <div class="zone done">HD·Av</div>
+        <div class="zone done">BG·Av</div>
+        <div class="zone active">BD·Av</div>
+        <div class="zone back-done">HG·Ar</div>
+        <div class="zone pending">HD·Ar</div>
+        <div class="zone pending">BG·Ar</div>
+        <div class="zone pending">BD·Ar</div>
+      </div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#48BB78" title="anim-avant"></div>
+      <div class="swatch" style="background:#2D6A4F" title="anim-arrière"></div>
+      <div class="swatch" style="background:rgba(255,255,255,0.04)" title="pending"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Grille 8 zones avec encodage profondeur</div>
+      <div class="desc-body">Les zones avant (vert vif) vs arrière (vert profond) montrent la différence de saturation. La zone active pulse. Les zones passées restent visibles en demi-teinte.</div>
+      <span class="desc-tag green">Zones avant #48BB78</span>
+      <span class="desc-tag">Zones arrière #2D6A4F</span>
+    </div>
+  </div>
+
+  <!-- D5 : Après / Micro-célébration -->
+  <div class="card">
+    <div class="card-label">Direction 4 — Phase Après <span class="badge">Session</span></div>
+    <div class="phone d5">
+      <div class="celebration-ring">🐉</div>
+      <div class="after-text">Le Dragon Molaire est guéri.</div>
+      <div class="after-hook">"Demain, il te mènera vers les cavernes du fond…"</div>
+      <div class="after-dot"></div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#F6AD55" title="accent-ambre"></div>
+      <div class="swatch" style="background:#1E2A3A" title="bg-session"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Célébration proportionnée + accroche narrative</div>
+      <div class="desc-body">La célébration est ambre — chaude, pas alarmante. Une seule phrase narrative crée le désir de revenir. Le point pulsant invite à fermer sans forcer.</div>
+      <span class="desc-tag ambre">Ambre célébration</span>
+      <span class="desc-tag">Accroche ouverte</span>
+    </div>
+  </div>
+
+</div>
+
+<p class="section-title">Écrans parent — Onboarding & Quotidien</p>
+
+<div class="grid">
+
+  <!-- D6 : Onboarding parent -->
+  <div class="card">
+    <div class="card-label">Direction 5 — Onboarding parent <span class="badge">Parent</span></div>
+    <div class="phone d6">
+      <div class="ob-title">Créer le profil de ton aventurier</div>
+      <div class="ob-sub">30 secondes. Aucun compte requis.</div>
+      <div class="ob-field">
+        <span class="field-icon">👤</span>
+        <span class="value">Lucas</span>
+      </div>
+      <div class="ob-field">
+        <span class="field-icon">📷</span>
+        <span class="placeholder">Autoriser la caméra</span>
+      </div>
+      <div class="ob-btn">Continuer →</div>
+      <div class="ob-camera-note">Traitement 100% sur l'appareil.<br>Aucune image envoyée.</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#2D3748" title="bg-parent"></div>
+      <div class="swatch" style="background:#3D4F63" title="bg-surface"></div>
+      <div class="swatch" style="background:#76E4F7" title="accent-cyan"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Sobre, rapide, rassurant</div>
+      <div class="desc-body">Une action par écran. La note caméra est inline — pas une modale. Le parent saisit le prénom et autorise. En 30 secondes, l'onboarding parent est terminé.</div>
+      <span class="desc-tag">≤ 3 min total</span>
+      <span class="desc-tag">Zéro compte</span>
+    </div>
+  </div>
+
+  <!-- D4 : Passage de main — sélection emoji -->
+  <div class="card">
+    <div class="card-label">Direction 6 — Passage de main <span class="badge">Enfant</span></div>
+    <div class="phone d4">
+      <div class="hand-title">C'est ton tour, Lucas.</div>
+      <div class="hand-sub">Choisis ton emblème d'aventurier.</div>
+      <div class="emoji-grid">
+        <div class="emoji-item selected">⚔️</div>
+        <div class="emoji-item">🐉</div>
+        <div class="emoji-item">🌟</div>
+        <div class="emoji-item">🦁</div>
+        <div class="emoji-item">🚀</div>
+        <div class="emoji-item">🧙</div>
+        <div class="emoji-item">🐺</div>
+        <div class="emoji-item">🦅</div>
+      </div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#1E2A3A" title="bg-session"></div>
+      <div class="swatch" style="background:rgba(118,228,247,0.15)" title="selected"></div>
+      <div class="swatch" style="background:#76E4F7" title="accent-cyan border"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Premier geste de l'enfant dans l'app</div>
+      <div class="desc-body">L'interface bascule en mode enfant. Pictographique, aucun texte à lire. L'enfant tape son emoji — c'est son premier acte d'appropriation avant le premier brossage.</div>
+      <span class="desc-tag">Mode enfant</span>
+      <span class="desc-tag ambre">Appropriation</span>
+    </div>
+  </div>
+
+  <!-- D7 : Accueil quotidien parent -->
+  <div class="card">
+    <div class="card-label">Direction 7 — Accueil quotidien <span class="badge">Parent</span></div>
+    <div class="phone d7">
+      <div class="home-greeting">Bonsoir, Romain</div>
+      <div class="home-time">20h15 · Session du soir</div>
+      <div class="profile-card">
+        <div class="profile-emoji">⚔️</div>
+        <div class="profile-name">Lucas</div>
+        <div class="profile-streak">Épisode 12 · Dragon Molaire</div>
+      </div>
+      <div class="launch-btn">Lancer l'aventure</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#2D3748" title="bg-parent"></div>
+      <div class="swatch" style="background:#3D4F63" title="bg-surface"></div>
+      <div class="swatch" style="background:#76E4F7" title="CTA cyan"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Accueil quotidien — 1 action principale</div>
+      <div class="desc-body">Le parent voit le profil de Lucas, l'épisode en cours, et un seul bouton. Détection automatique soir/matin. En 2 taps, la session est lancée.</div>
+      <span class="desc-tag">Détection horaire</span>
+      <span class="desc-tag">1 CTA visible</span>
+    </div>
+  </div>
+
+  <!-- D8 : Récupération permission caméra -->
+  <div class="card">
+    <div class="card-label">Direction 8 — Récupération caméra <span class="badge">Parent</span></div>
+    <div class="phone d8">
+      <div class="perm-icon">📷</div>
+      <div class="perm-title">La caméra n'est pas autorisée</div>
+      <div class="perm-body">BrossQuest a besoin de la caméra pour détecter le vrai geste de brossage de Lucas. Rien n'est enregistré ni envoyé.</div>
+      <div class="perm-steps">
+        <div class="perm-step"><div class="num">1</div>Ouvre Réglages iOS</div>
+        <div class="perm-step"><div class="num">2</div>Safari → Caméra</div>
+        <div class="perm-step"><div class="num">3</div>Choisir "Autoriser"</div>
+      </div>
+      <div class="perm-note">Lucas ne verra pas cet écran.</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#2D3748" title="bg-parent"></div>
+      <div class="swatch" style="background:#3D4F63" title="bg-surface"></div>
+      <div class="swatch" style="background:#76E4F7" title="accent-cyan"></div>
+    </div>
+    <div class="desc">
+      <div class="desc-title">Récupération d'erreur — côté parent uniquement</div>
+      <div class="desc-body">Instructions contextuelles iOS. Aucune couleur d'erreur rouge — c'est une aide, pas une alarme. La note "Lucas ne verra pas cet écran" rassure immédiatement.</div>
+      <span class="desc-tag">Parent seulement</span>
+      <span class="desc-tag">Pas de rouge</span>
+    </div>
+  </div>
+
+</div>
+
+<p class="section-title">Palette complète — "Profondeur des mondes"</p>
+
+<div style="max-width:1200px; margin: 0 auto; display:flex; flex-wrap:wrap; gap:12px;">
+  <div style="background:#1E2A3A; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:#A0AEC0;margin-bottom:4px;">bg-session</div>
+    <div style="font-size:16px;font-weight:700;color:#EDF2F7;">#1E2A3A</div>
+  </div>
+  <div style="background:#2D3748; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:#A0AEC0;margin-bottom:4px;">bg-parent</div>
+    <div style="font-size:16px;font-weight:700;color:#EDF2F7;">#2D3748</div>
+  </div>
+  <div style="background:#3D4F63; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:#A0AEC0;margin-bottom:4px;">bg-surface</div>
+    <div style="font-size:16px;font-weight:700;color:#EDF2F7;">#3D4F63</div>
+  </div>
+  <div style="background:#48BB78; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:rgba(0,0,0,0.5);margin-bottom:4px;">anim-avant</div>
+    <div style="font-size:16px;font-weight:700;color:#1E2A3A;">#48BB78</div>
+  </div>
+  <div style="background:#2D6A4F; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:#A0AEC0;margin-bottom:4px;">anim-arrière</div>
+    <div style="font-size:16px;font-weight:700;color:#EDF2F7;">#2D6A4F</div>
+  </div>
+  <div style="background:#76E4F7; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:rgba(0,0,0,0.5);margin-bottom:4px;">accent-cyan</div>
+    <div style="font-size:16px;font-weight:700;color:#1E2A3A;">#76E4F7</div>
+  </div>
+  <div style="background:#F6AD55; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:rgba(0,0,0,0.5);margin-bottom:4px;">accent-ambre</div>
+    <div style="font-size:16px;font-weight:700;color:#1E2A3A;">#F6AD55</div>
+  </div>
+  <div style="background:#FC8181; border-radius:12px; padding:16px 20px; flex:1; min-width:140px;">
+    <div style="font-size:11px;color:rgba(0,0,0,0.5);margin-bottom:4px;">erreur parent</div>
+    <div style="font-size:16px;font-weight:700;color:#1E2A3A;">#FC8181</div>
+  </div>
+</div>
+
+<div style="max-width:1200px;margin:48px auto 16px;text-align:center;font-size:11px;color:#718096;">
+  BrossQuest · UX Design Directions · 2026-03-24
+</div>
+
+</body>
+</html>
