@@ -4,6 +4,7 @@ status: complete
 inputDocuments:
   - "_bmad-output/brainstorming/brainstorming-session-2026-03-23-1400.md"
 date: 2026-03-23
+lastRevised: 2026-03-24
 author: Romain
 ---
 
@@ -13,15 +14,16 @@ author: Romain
 
 BrossQuest est une Progressive Web App conçue pour les enfants de 4 à 10 ans,
 accessible à un cercle restreint et gratuite. Elle transforme les 2 minutes de
-brossage quotidien en une mission de nettoyage narrative, où chaque zone de la
-bouche correspond à une zone à "réparer" dans l'histoire — les dents d'un dragon
-malade, la mousse d'un château assiégé, les rochers d'une grotte à débloquer.
+brossage quotidien en une aventure narrative séquentielle — l'enfant choisit son
+univers du jour (forêt, océan, espace…), puis son geste de brossage fait
+littéralement avancer l'histoire.
 
 L'application résout un problème précis : les enfants brossent en automatique,
-sans couvrir toutes les zones. BrossQuest structure les 2 minutes en segments
-temporels par zone, avec des micro-événements narratifs qui ramènent
-régulièrement l'attention de l'enfant sur le geste physique — sans instruction
-froide, sans texte, sans compétition entre l'écran et les dents.
+sans couvrir toutes les zones. BrossQuest détecte le mouvement réel de brossage
+via la caméra frontale (MediaPipe Hands) et structure les 2 minutes en une
+séquence en trois temps — mise en scène narrative, brossage actif guidé
+visuellement, micro-célébration — sans instruction froide, sans texte, sans
+compétition entre l'écran et les dents.
 
 ---
 
@@ -48,74 +50,105 @@ est respecté, pas la qualité du geste.
 
 ### Proposed Solution
 
-BrossQuest combine trois mécanismes complémentaires :
+BrossQuest articule quatre mécanismes complémentaires :
 
-**1. Métaphore narrative comme système de guidage**
-Chaque zone de la bouche correspond à une zone à nettoyer dans l'histoire.
-L'enfant ne reçoit pas d'instruction — il accomplit une mission dont la logique
-*est* le bon geste. La détection sonore (Web Audio API) valide la présence du
-brossage ; les zones se débloquent après un temps minimum de brossage actif.
+**1. Détection du vrai geste**
+BrossQuest utilise la caméra frontale (MediaPipe Hands, traitement 100%
+on-device) pour détecter le mouvement oscillatoire de la main dans la zone
+bouche. C'est la seule approche qui valide un brossage réel — pas juste
+une brosse allumée. Le téléphone posé sur le rebord du lavabo, face à
+l'enfant, est déjà dans la position naturelle : aucune contrainte de
+positionnement.
 
-**2. Micro-événements d'engagement**
-À intervalles réguliers dans chaque zone, des événements narratifs courts
-(un coffre qui s'ouvre, une animation d'intensité, un son signal distinct)
-ramènent l'attention de l'enfant vers l'écran — et donc vers la conscience
-de sa progression. Ces rappels sont fictifs dans le récit mais réels dans
-leur effet : ils brisent le pilote automatique sans punir ni interrompre.
+**2. Séquence temporelle en trois états**
+L'expérience est découpée en trois temps distincts :
+- **Avant (10-15s)** — narration vocale courte avec le prénom de l'enfant,
+  mise en scène de l'épisode, flux caméra visible quelques secondes pour
+  une calibration naturelle ("tu te vois ?"), puis fondu vers l'animation.
+- **Pendant (2 min)** — visuel seul, aucune narration, aucun son.
+  Une animation abstraite évocatrice (une masse sombre qui pulse, des
+  formes qui s'assemblent) se déplace lentement d'un quadrant à l'autre —
+  guidant implicitement la brosse sans instruction explicite. L'enfant
+  suit le mouvement, il ne lit pas une instruction.
+- **Après (5-10s)** — micro-célébration visuelle et sonore, accroche
+  narrative courte vers le prochain épisode.
 
-**3. Feedback de complétion par zone**
-À chaque zone complétée, une micro-animation de déblocage confirme le passage
-à la suivante. L'enfant acquiert progressivement le sens du découpage spatial
-de sa bouche par l'habitude narrative, pas par l'instruction.
+**3. Double niveau de progression**
+La **Collection** est le niveau méta : l'enfant choisit librement son
+univers du jour parmi ceux disponibles. Chaque univers reprend exactement
+là où il a été laissé. Ce choix quotidien est un acte d'agentivité qui
+précède et motive le brossage. La **Série** est le niveau narratif :
+chaque univers avance par épisodes quotidiens de 2 minutes, créant
+l'attachement et le désir de revenir le lendemain.
+
+**4. Onboarding avec passage de main**
+L'onboarding est une session unique en deux moments. Moment parent :
+sign-in social (Google/Apple), saisie du prénom. Moment enfant : l'écran
+bascule en mode pictographique, l'enfant choisit son emoji parmi une
+sélection — son premier geste dans l'app, avant même le premier brossage.
+Ce "passage de main" est un rituel d'entrée : l'enfant ne reçoit pas
+un compte configuré, il prend possession de son univers.
 
 ### Key Differentiators
 
-- **Métaphore narrative comme guidage** : les zones de l'histoire = les zones
-  de la bouche, sans instruction froide
-- **Micro-événements d'engagement** : rappels d'attention déguisés en moments
-  narratifs — brisent le pilote automatique sans punir
+- **Détection du vrai geste** : MediaPipe Hands valide le mouvement réel de
+  la main, pas juste la présence d'une brosse allumée — le seul signal honnête
+- **Séquence sacrée** : Avant / Pendant / Après — trois états distincts qui
+  éliminent tout conflit cognitif entre l'aventure et le brossage
 - **Le brossage est le moteur** : l'histoire ne progresse que si l'enfant brosse
-- **Attention redirigée vers le geste** : l'écran est support narratif discret,
-  pas aimant à attention
+- **Animation abstraite guidante** : les quadrants dentaires sont encodés dans
+  le comportement visuel, sans carte ni instruction froide
+- **Double progression** : Collection (agentivité quotidienne) + Série
+  (attachement narratif par épisodes) — deux leviers de motivation distincts
+- **Passage de main** : l'enfant prend possession de l'app dès l'onboarding,
+  avant même le premier brossage
 - **Philosophie bienveillante** : zéro pénalité, zéro notification, zéro pression
 - **PWA offline-first** : sans App Store, fonctionne sans réseau
-- **Accès restreint, gratuit** : conçu pour un cercle familial proche
+- **Focus absolu** : BrossQuest résout un seul problème, en profondeur
 
 ### V1 → V2 Roadmap
 
-V1 — Cercle restreint, accompagnement parental au lancement, guidage explicite
-par zones avec métaphore narrative directe et micro-événements d'engagement.
+V1 — Cercle restreint. Détection visuelle (MediaPipe Hands). Séquence
+Avant/Pendant/Après. Collection + Série. Onboarding avec passage de main.
+Accompagnement parental au lancement.
 
-V2 — Autonomie progressive de l'enfant, guidage implicite au fil des mondes
-débloqués (l'enfant a intégré les automatismes), lancement indépendant.
+V2 — Mode Audio (brosses manuelles) : détection sonore via Web Audio API,
+avec ses propres défis techniques à résoudre proprement. Autonomie progressive
+de l'enfant. Guidage par zones progressivement implicite au fil des univers
+débloqués.
 
-Les deux axes — autonomie et implicite — évoluent ensemble, l'app grandissant
-avec l'enfant.
+*Note : la frontière précise V1/V2 sera arbitrée dans le PRD — le product
+brief fixe la vision complète, pas le scope de livraison.*
 
 ### Constraints & Key Risks
 
-**Densité de contenu narratif**
-L'engagement repose sur la nouveauté narrative. La V1 doit prévoir un volume
-de contenu suffisant pour tenir 3 à 6 mois d'usage quotidien sans répétition
-perceptible. C'est une contrainte de production à adresser avant le lancement.
+**Fiabilité de la détection visuelle**
+MediaPipe Hands doit être validé en conditions réelles : éclairage salle de
+bain (souvent faible ou contre-jour), distance 40-70cm, enfant en mouvement,
+brosse dans la bouche. Ce spike technique conditionne l'ensemble du produit —
+c'est la dépendance critique à lever avant tout développement fonctionnel.
 
-**Fiabilité de la détection sonore**
-La détection via Web Audio API doit être validée en conditions réelles : salle
-de bain, robinet ouvert, brosse électrique, environnement bruité. Des tests en
-conditions réelles sont une condition de lancement V1, pas une itération
-post-lancement.
+**Performance on-device**
+Le traitement MediaPipe est 100% local (aucune donnée transmise). La charge
+CPU sur des appareils mid-range doit rester compatible avec une expérience
+fluide pendant 2 minutes. À valider dans le spike.
+
+**Densité de contenu narratif**
+L'engagement repose sur la nouveauté. Le volume d'épisodes produits doit tenir
+3 à 6 mois d'usage quotidien sans répétition perceptible (deux sessions/jour
+maximum). Les épisodes flashback (#35) réduisent la pression de production,
+mais ne l'éliminent pas.
 
 **Honnêteté de la promesse produit**
-BrossQuest améliore l'attention et la conscience des zones de brossage. Elle
-ne peut pas garantir la couverture réelle sans capteur physique de position.
-La promesse produit doit refléter cette limite : une meilleure habitude, pas
-un brossage médicalement certifié.
+BrossQuest améliore l'attention et la conscience des zones. Elle ne peut pas
+certifier la couverture réelle sans capteur physique de position. La promesse
+est : une meilleure habitude, pas un brossage médicalement certifié.
 
 **Friction de démarrage**
 Le contexte d'usage (soir, parent fatigué, enfant pressé) impose une friction
-minimale. Contrainte UX : le temps entre "sortir le téléphone" et "brossage
-actif dans l'app" ne doit pas dépasser 10 secondes. Cette contrainte est un
-KPI de conception, pas une évidence technique.
+minimale. Contrainte UX : moins de 10 secondes entre "sortir le téléphone"
+et "brossage actif dans l'app". La détection de présence par caméra et
+l'auto-démarrage sont des leviers techniques directs sur cette contrainte.
 
 ---
 
@@ -180,15 +213,22 @@ Le parent entend parler de BrossQuest par Romain (partage direct, lien PWA).
 Pas d'App Store, pas de recherche — accès sur invitation uniquement.
 
 **Onboarding**
-Le parent crée un compte (email + mot de passe), crée le profil de l'enfant
-(prénom + icône). Durée cible : moins de 3 minutes. L'enfant n'intervient pas
-dans l'onboarding — c'est un espace parent.
+Onboarding en une session, deux moments. Moment parent : sign-in social
+(Google ou Apple, zéro création de compte), saisie du prénom de l'enfant —
+rapide, textuel, sobre. Moment enfant : l'écran bascule en mode pictographique,
+l'enfant choisit son emoji parmi une sélection. C'est son premier geste dans
+l'app, avant même le premier brossage — le "passage de main". Durée cible :
+moins de 3 minutes. L'emoji est modifiable à tout moment, ce qui permet au
+parent de tester seul puis de finaliser avec l'enfant.
 
 **Usage quotidien**
-Soir ou matin : le parent ouvre l'app, sélectionne le profil de l'enfant,
-tend le téléphone. L'enfant lance la session en appuyant sur une grande
-animation pulsante. Le parent peut rester ou partir. L'app tourne 2 minutes,
-l'enfant brosse.
+Soir ou matin : le parent ouvre l'app, tend le téléphone posé sur le rebord
+du lavabo. L'app détecte la présence de l'enfant via la caméra et propose un
+grand bouton animé pulsant — ou démarre automatiquement après 3 secondes.
+L'enfant choisit son univers du jour (Collection), la narration vocale courte
+démarre (Avant), puis il brosse pendant que l'animation abstraite guide
+silencieusement ses quadrants (Pendant), avant la micro-célébration (Après).
+Le parent peut rester ou partir.
 
 **Moment "aha"**
 Pour l'enfant : la première fois qu'il voit une zone narrative se débloquer
@@ -254,73 +294,80 @@ vraiment pour au moins un enfant, durablement.
 
 ## MVP Scope
 
-### Prerequisite — Spike Technique
+### Prerequisite — Spike Technique Visuel
 
-Avant tout développement, valider la détection sonore en conditions réelles :
-salle de bain, robinet ouvert, brosse manuelle et électrique. Ce prototype
-isolé conditionne l'ensemble du MVP — si la détection ne tient pas, les
-mécaniques core s'effondrent. C'est la dépendance critique du projet.
+Avant tout développement fonctionnel, valider MediaPipe Hands en conditions
+réelles : salle de bain, éclairage variable, distance 40-70cm, enfant en
+mouvement, brosse dans la bouche. Ce prototype isolé conditionne l'ensemble
+du produit — si la détection ne tient pas fiablement, les mécaniques core
+s'effondrent. C'est la dépendance critique du projet.
 
 ### Core Features
 
-**Moteur de brossage**
-- Détection sonore via Web Audio API : trois états (brossage / voix / silence)
-- Progression narrative pilotée par le brossage actif
-- Zones débloquées après un temps minimum de brossage par segment
+**Moteur de détection**
+- Détection visuelle via MediaPipe Hands (on-device, aucune donnée transmise)
+- Détection de présence à l'approche → déclenchement du lancement
+- Fondu de calibration : flux caméra visible 3-5s, puis estompage vers l'animation
+- Progression narrative pilotée par le mouvement réel de brossage
 
-**Univers narratif unique**
-- Un univers complet avec guidage par zones intégré à la narration
-- Métaphore de nettoyage cohérente sur l'ensemble de l'univers
-- Micro-événements d'engagement à intervalles réguliers dans chaque zone
-- Feedback visuel de complétion par zone
-- Micro-célébration de fin de session (animation simple)
+**Séquence Avant / Pendant / Après**
+- **Avant** : narration vocale courte avec prénom, mise en scène de l'épisode
+- **Pendant** : visuel seul — animation abstraite évocatrice, mouvement de
+  zone sur 4 quadrants (≈30s chacun), aucune narration, aucun son
+- **Après** : micro-célébration discrète (session ordinaire) ou animation
+  mémorable (fin d'univers)
 
-**Onboarding parent**
-- Saisie du prénom de l'enfant (injection dans la narration)
-- Choix d'une icône de profil
-- Un seul profil enfant par installation
+**Collection + Série**
+- Collection d'univers disponibles — l'enfant choisit librement son univers
+  du jour à chaque session
+- Chaque univers maintient sa propre progression narrative indépendante
+  (épisodes séquentiels), reprenant exactement là où elle a été laissée
+- Épisodes flashback possibles (souvenir d'un moment clé) — réduit la
+  pression de production de nouveau contenu
+
+**Onboarding avec passage de main**
+- Sign-in social (Google ou Apple) — zéro création de compte
+- Saisie du prénom de l'enfant par le parent (injection dans la narration)
+- Passage de main : l'enfant choisit son emoji — premier geste dans l'app
+- Emoji modifiable à tout moment depuis le profil
+
+**Adaptation matin / soir**
+- Détection automatique de la période basée sur l'heure de lancement
+- Seuil configurable par le parent (défaut : 17h)
+- Ton narratif adapté : énergisant le matin, apaisant le soir
 
 **Infrastructure PWA**
 - Progressive Web App installable sur écran d'accueil
-- Fonctionnement offline via Service Worker
-- Stockage local via localStorage (pas de backend ni de compte cloud en V1)
+- Fonctionnement offline via Service Worker + IndexedDB
+- Sync cloud de la progression (multi-appareils)
 - Temps de démarrage ≤ 10 secondes depuis l'écran d'accueil
 
-### Quick Follow-on (post-validation spike)
+### Out of Scope (philosophique)
 
-**Adaptation matin / soir**
-- Détection automatique de la période (matin : 0h–16h59 / soir : 17h–23h59)
-- Ton narratif adapté : énergisant le matin, apaisant le soir
-- Ajoutée rapidement après validation du spike technique — pas un
-  prérequis pour tester les mécaniques core, mais non-négociable avant
-  usage familial régulier
+Ces éléments sont exclus par principe, indépendamment du scope de livraison :
 
-### Out of Scope for MVP
-
-- **Profils multiples** : un seul enfant par installation en V1
-- **Univers multiples** : un seul univers pour valider les mécaniques core
-- **Compte parent avec sync cloud** : localStorage uniquement
-- **Guidage implicite** : guidage par zones explicite en V1
-- **Autonomie de lancement enfant** : lancement initié par le parent en V1
-- **Notifications ou rappels** : aucune sollicitation sortante
+- **Notifications ou rappels** : aucune sollicitation sortante, jamais
+- **Reporting comportemental au parent** : la progression appartient à l'enfant
+- **Gamification punitive** : aucun streak cassé, aucune pénalité, aucune pression
+- **Mode audio V1** : la détection sonore (brosses manuelles) est une phase
+  distincte avec ses propres défis — elle sera adressée proprement en V2
 
 ### MVP Success Criteria
 
-L'app est prête à sortir du MVP quand :
+L'app est prête à valider son MVP quand :
+- Le spike visuel (MediaPipe Hands) fonctionne fiablement en conditions réelles
 - L'enfant demande l'app de lui-même après 2 semaines d'usage
-- La détection sonore fonctionne de façon fiable en conditions réelles
 - Un parent du cercle proche est autonome après une démonstration
 - Flux de démarrage ≤ 10 secondes
 
 ### Future Vision
 
-**V2 — L'app grandit avec l'enfant**
-- Multi-profils enfants par compte parent
-- Univers multiples débloquables (forêt → océan → espace…)
-- Compte parent avec sync cloud et accès multi-appareils
-- Guidage par zones progressivement implicite au fil des mondes
+**Horizon suivant**
+- Mode Audio (brosses manuelles) : détection sonore via Web Audio API,
+  trois états brossage / voix / silence
 - Autonomie de lancement pour l'enfant
-- Pont visuel zone narrative → zone réelle affiné selon retours V1
+- Guidage par zones progressivement implicite au fil des univers
+- Multi-profils enfants par compte parent
 
 **Horizon long terme**
 - Élargissement vers les 4-5 ans avec mécaniques adaptées
