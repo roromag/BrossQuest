@@ -5,23 +5,12 @@
 # Claude Code skills (BMAD installed skills)
 .claude/skills/
 
-# BMAD modules - framework files only, configs kept
-_bmad/bmb/
-_bmad/cis/
-_bmad/core/
-_bmad/tea/
-_bmad/_config/
-_bmad/_memory/
-_bmad/bmm/agents/
-_bmad/bmm/teams/
-_bmad/bmm/workflows/
-_bmad/bmm/data/
-_bmad/bmm/module-help.csv
+# BMAD modules - full directory excluded (reinstallable)
+_bmad/
 
 # =============================================
 # Project files to KEEP (not ignored)
 # =============================================
-# _bmad/bmm/config.yaml        ← project config
 # _bmad-output/                ← all project outputs
 # .claude/projects/            ← Claude memory
 
