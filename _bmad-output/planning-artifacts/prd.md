@@ -513,7 +513,7 @@ P1 (session nominale) · P2 (décrochage) · P3 (onboarding parent) · P4 (cercl
 | FR9 | Lancement de la session par tap unique de l'enfant (déclenchement getUserMedia par geste utilisateur) |
 | FR10 | Structure de session en 3 phases séquentielles : Avant / Pendant / Après |
 | FR11 | Phase Avant : flux caméra visible brièvement pour calibration naturelle, puis fondu avant la phase Pendant |
-| FR12 | Phase Pendant structurée en 4 segments correspondant aux quadrants buccaux |
+| FR12 | Phase Pendant structurée en 8 segments (4 quadrants × avant/arrière) — ~15 secondes chacun |
 | FR13 | Progression de l'animation d'un quadrant au suivant selon le temps de brossage actif cumulé sur ce quadrant |
 | FR14 | Micro-événements d'animation déclenchés par inattention détectée — non aléatoires, non programmés |
 | FR15 | Micro-célébration visuelle et sonore à la fin d'une session complète |

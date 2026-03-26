@@ -80,7 +80,7 @@ NFR-X4: App fonctionnelle sans connexion internet après première installation
 ### Additional Requirements
 
 - **Starter template** : `npm create vite@latest brossquest -- --template react-ts` + Tailwind CSS v4 (`@tailwindcss/vite`) + vite-plugin-pwa + Vitest + Testing Library + jsdom. L'initialisation du projet constitue la première story d'implémentation (Epic 1, Story 1)
-- **MediaPipe WASM chargé en différé** : au tap session uniquement, pas au démarrage app — libère le budget démarrage ≤ 10s
+- **MediaPipe WASM chargé en différé** : commence à charger au montage de `/home`, pas au démarrage de l'app (NFR-P2 = ne bloque pas le LCP au démarrage). `getUserMedia` est appelé au tap uniquement — pas MediaPipe. Le `PulseButton` est activé quand le WASM est prêt (`isMediaPipeLoading = false`)
 - **getUserMedia iOS Safari** : uniquement dans le même event handler que le tap utilisateur — aucune logique asynchrone entre le tap et l'appel getUserMedia
 - **AudioContext iOS** : créé/resumed dans le geste utilisateur du tap session, repris obligatoirement au retour au premier plan
 - **IndexedDB source de vérité unique** : 4 tables (profiles, episodes, SessionState, sessionHistory) — Dexie comme ORM
@@ -196,6 +196,7 @@ So that disposer d'une base de code opérationnelle déployée sur GitHub Pages 
 **And** `npm run build` produit un bundle statique sans erreur TypeScript strict
 **And** un push sur `main` déclenche un workflow GitHub Actions qui déploie le build sur GitHub Pages
 **And** l'URL GitHub Pages est accessible et charge l'app
+**And** `vite-plugin-pwa` est configuré en mode `generateSW` minimal dans `vite.config.ts` — Service Worker actif dès le premier déploiement GitHub Pages (offline disponible avant Epic 5)
 
 ### Story 1.2 : Architecture routing, guards & structure dossiers
 
