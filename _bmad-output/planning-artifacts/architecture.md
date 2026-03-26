@@ -330,7 +330,7 @@ npm install -D vitest @testing-library/react @testing-library/user-event jsdom
 | Dimension | Décision |
 |---|---|
 | Langage | TypeScript strict |
-| Bundler | Vite v8 (ESM natif, HMR) |
+| Bundler | Vite v7.3.1 (ESM natif, HMR) — v8 incompatible vite-plugin-pwa@1.2.0 |
 | Styling | Tailwind CSS v4 via `@tailwindcss/vite` |
 | PWA / Service Worker | vite-plugin-pwa v1.2.0 (Workbox, cache-first) |
 | Tests | Vitest + Testing Library + jsdom |

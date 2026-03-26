@@ -24,9 +24,15 @@ Thumbs.db
 .env*.local
 
 # =============================================
-# Node / build artifacts (if app is built later)
+# Node / build artifacts
 # =============================================
 node_modules/
 dist/
 build/
 .cache/
+
+# =============================================
+# Vite / TypeScript
+# =============================================
+.env.local
+*.tsbuildinfo
