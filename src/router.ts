@@ -1,4 +1,4 @@
-import { createRouter } from '@tanstack/react-router'
+import { createRouter, createRoute, redirect } from '@tanstack/react-router'
 import { rootRoute } from './routes/__root'
 import { onboardingRoute } from './routes/onboarding.route'
 import { handoffRoute } from './routes/handoff.route'
@@ -12,7 +12,14 @@ import { recoveryProfileRoute } from './routes/recovery.profile.route'
 // Routes protégées par CameraGuard (permission caméra) → home, session
 // NB: les guards sont définis dans beforeLoad de chaque route (voir fichiers .route.tsx)
 
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  beforeLoad: () => { throw redirect({ to: '/onboarding' }) },
+})
+
 const routeTree = rootRoute.addChildren([
+  indexRoute,
   onboardingRoute,
   handoffRoute,
   homeRoute,
