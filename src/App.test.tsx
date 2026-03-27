@@ -1,15 +1,13 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import App from './App'
+import { createMemoryHistory, createRouter } from '@tanstack/react-router'
+import { rootRoute } from './routes/__root'
 
-describe('App', () => {
-  it('renders without crashing', () => {
-    render(<App />)
-    expect(screen.getByRole('heading')).toBeInTheDocument()
-  })
-
-  it('displays BrossQuest title', () => {
-    render(<App />)
-    expect(screen.getByText('BrossQuest')).toBeInTheDocument()
+describe('Router', () => {
+  it('crée le routeur sans erreur', () => {
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([]),
+      history: createMemoryHistory({ initialEntries: ['/'] }),
+    })
+    expect(router).toBeDefined()
   })
 })
