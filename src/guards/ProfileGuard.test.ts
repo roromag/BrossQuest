@@ -1,45 +1,28 @@
-import 'fake-indexeddb/auto'  // ← remplace globalement indexedDB par fake
+import 'fake-indexeddb/auto'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { db } from '../lib/db/schema'
 import { checkOnboardingComplete } from './ProfileGuard'
+import type { Profile } from '../types/profile.types'
+
+beforeEach(async () => {
+  await db.delete()
+  await db.open()
+})
 
 describe('checkOnboardingComplete', () => {
-  beforeEach(() => {
-    // Reset DB entre tests
-    indexedDB.deleteDatabase('brossquest')
-  })
-
-  it('retourne false si la DB est vide', async () => {
+  it('retourne false si DB vide', async () => {
     expect(await checkOnboardingComplete()).toBe(false)
   })
 
-  it('retourne false si profile.onboardingComplete = false', async () => {
-    const db = await openTestDb()
-    await addProfile(db, { id: '1', onboardingComplete: false })
-    db.close()
+  it('retourne false si onboardingComplete = false', async () => {
+    const p: Profile = { id: '1', firstName: 'A', emoji: '🐱', createdAt: 0, onboardingComplete: false }
+    await db.profiles.put(p)
     expect(await checkOnboardingComplete()).toBe(false)
   })
 
-  it('retourne true si profile.onboardingComplete = true', async () => {
-    const db = await openTestDb()
-    await addProfile(db, { id: '1', onboardingComplete: true })
-    db.close()
+  it('retourne true si onboardingComplete = true', async () => {
+    const p: Profile = { id: '1', firstName: 'A', emoji: '🐱', createdAt: 0, onboardingComplete: true }
+    await db.profiles.put(p)
     expect(await checkOnboardingComplete()).toBe(true)
   })
 })
-
-async function openTestDb(): Promise<IDBDatabase> {
-  return new Promise((resolve) => {
-    const req = indexedDB.open('brossquest', 1)
-    req.onupgradeneeded = () => {
-      req.result.createObjectStore('profiles', { keyPath: 'id' })
-    }
-    req.onsuccess = () => resolve(req.result)
-  })
-}
-
-async function addProfile(db: IDBDatabase, profile: Record<string, unknown>) {
-  return new Promise<void>((resolve) => {
-    const tx = db.transaction('profiles', 'readwrite')
-    tx.objectStore('profiles').add(profile)
-    tx.oncomplete = () => resolve()
-  })
-}

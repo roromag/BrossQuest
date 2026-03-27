@@ -1,6 +1,8 @@
 import 'fake-indexeddb/auto'
+import { beforeEach, afterEach, describe, expect, it } from 'vitest'
+import { db } from '../lib/db/schema'
 import { getCompletedSessionForCurrentPeriod, getCurrentPeriod } from './SessionPeriodGuard'
-import type { SessionPeriod } from '../types/session.types'
+import type { SessionHistoryEntry } from '../types/session.types'
 
 describe('getCurrentPeriod', () => {
   beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }) })
@@ -18,8 +20,9 @@ describe('getCurrentPeriod', () => {
 })
 
 describe('getCompletedSessionForCurrentPeriod', () => {
-  beforeEach(() => {
-    indexedDB.deleteDatabase('brossquest')
+  beforeEach(async () => {
+    await db.delete()
+    await db.open()
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(new Date('2026-03-27T09:00:00'))
   })
@@ -33,53 +36,60 @@ describe('getCompletedSessionForCurrentPeriod', () => {
   })
 
   it('retourne null si aucune session complétée aujourd\'hui', async () => {
-    const db = await openTestDb()
     const yesterday = new Date('2026-03-26T08:00:00').getTime()
-    await addSession(db, { id: '1', period: 'morning', status: 'completed', date: yesterday })
-    db.close()
+    const entry: SessionHistoryEntry = {
+      id: '1', episodeId: 'ep-001', date: yesterday,
+      period: 'morning', totalDuration: 600, totalPauseTime: 0,
+      zonesCompleted: 8, status: 'completed',
+    }
+    await db.sessionHistory.put(entry)
     expect(await getCompletedSessionForCurrentPeriod()).toBeNull()
   })
 
   it('retourne null si session d\'aujourd\'hui mais période différente', async () => {
-    const db = await openTestDb()
     const todayMorning = new Date('2026-03-27T08:00:00').getTime()
-    await addSession(db, { id: '1', period: 'evening', status: 'completed', date: todayMorning })
-    db.close()
+    const entry: SessionHistoryEntry = {
+      id: '1', episodeId: 'ep-001', date: todayMorning,
+      period: 'evening', totalDuration: 600, totalPauseTime: 0,
+      zonesCompleted: 8, status: 'completed',
+    }
+    await db.sessionHistory.put(entry)
     expect(await getCompletedSessionForCurrentPeriod()).toBeNull()
   })
 
-  it('retourne {period} si session complétée aujourd\'hui pour la période courante', async () => {
-    const db = await openTestDb()
+  it('retourne {period} si session matinale complétée aujourd\'hui', async () => {
     const todayMorning = new Date('2026-03-27T08:00:00').getTime()
-    await addSession(db, { id: '1', period: 'morning' as SessionPeriod, status: 'completed', date: todayMorning })
-    db.close()
+    const entry: SessionHistoryEntry = {
+      id: '1', episodeId: 'ep-001', date: todayMorning,
+      period: 'morning', totalDuration: 600, totalPauseTime: 0,
+      zonesCompleted: 8, status: 'completed',
+    }
+    await db.sessionHistory.put(entry)
     const result = await getCompletedSessionForCurrentPeriod()
     expect(result).toEqual({ period: 'morning' })
   })
 
+  it('retourne {period} si session du soir complétée pour la période "evening"', async () => {
+    vi.setSystemTime(new Date('2026-03-27T18:00:00'))
+    const todayEvening = new Date('2026-03-27T17:30:00').getTime()
+    const entry: SessionHistoryEntry = {
+      id: '1', episodeId: 'ep-001', date: todayEvening,
+      period: 'evening', totalDuration: 600, totalPauseTime: 0,
+      zonesCompleted: 8, status: 'completed',
+    }
+    await db.sessionHistory.put(entry)
+    const result = await getCompletedSessionForCurrentPeriod()
+    expect(result).toEqual({ period: 'evening' })
+  })
+
   it('retourne null si session d\'aujourd\'hui mais status interrompu', async () => {
-    const db = await openTestDb()
     const todayMorning = new Date('2026-03-27T08:00:00').getTime()
-    await addSession(db, { id: '1', period: 'morning', status: 'interrupted', date: todayMorning })
-    db.close()
+    const entry: SessionHistoryEntry = {
+      id: '1', episodeId: 'ep-001', date: todayMorning,
+      period: 'morning', totalDuration: 300, totalPauseTime: 0,
+      zonesCompleted: 4, status: 'interrupted',
+    }
+    await db.sessionHistory.put(entry)
     expect(await getCompletedSessionForCurrentPeriod()).toBeNull()
   })
 })
-
-async function openTestDb(): Promise<IDBDatabase> {
-  return new Promise((resolve) => {
-    const req = indexedDB.open('brossquest', 1)
-    req.onupgradeneeded = () => {
-      req.result.createObjectStore('sessionHistory', { keyPath: 'id' })
-    }
-    req.onsuccess = () => resolve(req.result)
-  })
-}
-
-async function addSession(db: IDBDatabase, session: Record<string, unknown>) {
-  return new Promise<void>((resolve) => {
-    const tx = db.transaction('sessionHistory', 'readwrite')
-    tx.objectStore('sessionHistory').add(session)
-    tx.oncomplete = () => resolve()
-  })
-}

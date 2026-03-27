@@ -12,3 +12,12 @@ export interface SessionHistoryEntry {
   zonesCompleted: number
   status: SessionStatus
 }
+
+export interface SessionState {
+  episodeId: string
+  activeZone: number          // 1–8
+  zoneProgress: Record<number, number>  // { zoneId: secondesCumulées }
+  status: SessionStatus
+  startedAt: number           // Date.now()
+  period: SessionPeriod
+}

@@ -7,9 +7,11 @@ export const sessionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/session',
   beforeLoad: async () => {
-    const onboarded = await checkOnboardingComplete()
+    const [onboarded, camPerm] = await Promise.all([
+      checkOnboardingComplete(),
+      checkCameraPermission(),
+    ])
     if (!onboarded) throw redirect({ to: '/onboarding' })
-    const camPerm = await checkCameraPermission()
     if (camPerm === 'denied') throw redirect({ to: '/recovery/camera' })
   },
   component: () => <div>Session — placeholder Story 3.2</div>,

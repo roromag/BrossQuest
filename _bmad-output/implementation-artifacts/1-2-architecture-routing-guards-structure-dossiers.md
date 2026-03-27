@@ -611,22 +611,30 @@ claude-sonnet-4-6
 - T4 : `router.ts` avec `basepath: '/BrossQuest'`, `main.tsx` mis à jour, `App.tsx` supprimé, `App.test.tsx` migré vers smoke test router
 - T5 : 11 tests unitaires (3 fichiers) — tous verts — couvrant les 3 guards
 - T6 : `npm run build` clean TypeScript strict, `npm test` 14/14 vert
+- ✅ Resolved [CRITICAL] P-1 : flag `settled` dans ProfileGuard + SessionPeriodGuard — évite double-resolve et InvalidStateError sur première ouverture DB
+- ✅ Resolved [HIGH] P-3 : `tx.onerror` ajouté dans ProfileGuard + SessionPeriodGuard — Promise ne se bloque plus si transaction avorte
+- ✅ Resolved [HIGH] P-2 : `home.route.tsx` loader utilise `getCurrentPeriod()` au lieu de `'morning'` par défaut
+- ✅ Resolved [MEDIUM] P-7 : `getCompletedSessionForCurrentPeriod` — `const now = new Date()` unique pour `period` et `todayStart`
+- ✅ Resolved [MEDIUM] P-8 : `beforeLoad` de `homeRoute` et `sessionRoute` utilisent `Promise.all` pour les deux guards parallèles
+- ✅ Resolved [HIGH] P-4 : `deleteDatabase` awaité dans `beforeEach` de ProfileGuard.test + SessionPeriodGuard.test
+- ✅ Resolved [MEDIUM] P-5 : `openTestDb` + `addProfile` + `addSession` — `onerror` ajouté, promesses ne se bloquent plus silencieusement
+- ✅ Resolved [LOW] P-10 : test evening ajouté dans SessionPeriodGuard.test — chemin `period: 'evening'` couvert
 
 ### File List
 
 - src/types/profile.types.ts (créé)
 - src/types/session.types.ts (créé)
-- src/guards/ProfileGuard.tsx (créé)
+- src/guards/ProfileGuard.tsx (créé, modifié post-review)
 - src/guards/CameraGuard.tsx (créé)
-- src/guards/SessionPeriodGuard.tsx (créé)
-- src/guards/ProfileGuard.test.ts (créé)
+- src/guards/SessionPeriodGuard.tsx (créé, modifié post-review)
+- src/guards/ProfileGuard.test.ts (créé, modifié post-review)
 - src/guards/CameraGuard.test.ts (créé)
-- src/guards/SessionPeriodGuard.test.ts (créé)
+- src/guards/SessionPeriodGuard.test.ts (créé, modifié post-review)
 - src/routes/__root.tsx (créé)
 - src/routes/onboarding.route.tsx (créé)
 - src/routes/handoff.route.tsx (créé)
-- src/routes/home.route.tsx (créé)
-- src/routes/session.route.tsx (créé)
+- src/routes/home.route.tsx (créé, modifié post-review)
+- src/routes/session.route.tsx (créé, modifié post-review)
 - src/routes/parent.route.tsx (créé)
 - src/routes/recovery.camera.route.tsx (créé)
 - src/routes/recovery.profile.route.tsx (créé)
@@ -640,3 +648,4 @@ claude-sonnet-4-6
 ## Change Log
 
 - 2026-03-27 : Implémentation Story 1.2 — routing TanStack Router code-based (7 routes), guards IndexedDB bruts (ProfileGuard, CameraGuard, SessionPeriodGuard), types TypeScript (Profile, SessionHistoryEntry), 14 tests unitaires verts, build strict TypeScript clean
+- 2026-03-27 : Correctifs post-review — 8 patches appliqués (settled flag double-resolve, tx.onerror, période loader, Promise.all guards, deleteDatabase awaité, error handlers tests, test evening) — 15/15 tests verts
