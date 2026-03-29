@@ -13,7 +13,18 @@ vi.mock('../stores/useProfileStore', () => ({
   ),
 }))
 
-import { NameStep, OnboardingPage } from '../routes/onboarding.route'
+vi.mock('../guards/CameraGuard', () => ({
+  checkCameraPermission: vi.fn().mockResolvedValue('prompt'),
+}))
+
+const mockSetPermissionState = vi.fn()
+vi.mock('../stores/useCameraStore', () => ({
+  useCameraStore: vi.fn((selector: (s: { setPermissionState: typeof mockSetPermissionState }) => unknown) =>
+    selector({ setPermissionState: mockSetPermissionState })
+  ),
+}))
+
+import { NameStep, CameraStep, OnboardingPage } from '../routes/onboarding.route'
 
 describe('NameStep', () => {
   beforeEach(() => {
@@ -86,10 +97,63 @@ describe('NameStep', () => {
   })
 })
 
-// P4 — transition NameStep → CameraStep dans OnboardingPage (AC Scénario 2)
+describe('CameraStep', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: { getUserMedia: vi.fn() },
+      configurable: true,
+    })
+  })
+
+  it('appelle onComplete immédiatement si permission déjà accordée', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('granted')
+    const onComplete = vi.fn()
+    render(<CameraStep onComplete={onComplete} />)
+    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
+  })
+
+  it('affiche le bouton autoriser si permission en attente', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
+    render(<CameraStep onComplete={vi.fn()} />)
+    expect(await screen.findByRole('button', { name: /autoriser la caméra/i })).toBeInTheDocument()
+    expect(screen.getByText(/localement/i)).toBeInTheDocument()
+  })
+
+  it('appelle onComplete après getUserMedia success', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
+    const mockStream = { getTracks: () => [{ stop: vi.fn() }] }
+    vi.mocked(navigator.mediaDevices.getUserMedia).mockResolvedValue(mockStream as unknown as MediaStream)
+    const onComplete = vi.fn()
+    render(<CameraStep onComplete={onComplete} />)
+    await userEvent.click(await screen.findByRole('button', { name: /autoriser la caméra/i }))
+    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
+    expect(mockSetPermissionState).toHaveBeenCalledWith('granted')
+  })
+
+  it('affiche PermissionRecovery si getUserMedia échoue', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
+    const error = new DOMException('Permission denied', 'NotAllowedError')
+    vi.mocked(navigator.mediaDevices.getUserMedia).mockRejectedValue(error)
+    render(<CameraStep onComplete={vi.fn()} />)
+    await userEvent.click(await screen.findByRole('button', { name: /autoriser la caméra/i }))
+    expect(await screen.findByRole('button', { name: /j'ai autorisé/i })).toBeInTheDocument()
+    expect(mockSetPermissionState).toHaveBeenCalledWith('denied')
+  })
+})
+
+// P4 — transition NameStep → CameraStep → PWA dans OnboardingPage
 describe('OnboardingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: { getUserMedia: vi.fn() },
+      configurable: true,
+    })
   })
 
   it('affiche le champ prénom au premier rendu', () => {
@@ -97,8 +161,10 @@ describe('OnboardingPage', () => {
     expect(screen.getByLabelText(/prénom/i)).toBeInTheDocument()
   })
 
-  // P3 — asserter setProfile (AC Scénario 2) + P4 — transition vers caméra
-  it('appelle setProfile et passe à l\'étape caméra après soumission valide', async () => {
+  // P3 — asserter setProfile (AC Scénario 2) + transition vers caméra
+  it("appelle setProfile et passe à l'étape caméra après soumission valide", async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
     const { saveProfile } = await import('../lib/db/queries')
     render(<OnboardingPage />)
 
@@ -106,10 +172,24 @@ describe('OnboardingPage', () => {
     await userEvent.click(screen.getByRole('button', { name: /continuer/i }))
 
     await waitFor(() => expect(saveProfile).toHaveBeenCalledOnce())
-    // P3 — vérifier que le store Zustand est bien mis à jour (AC Scénario 2)
     expect(mockSetProfile).toHaveBeenCalledOnce()
     expect(mockSetProfile).toHaveBeenCalledWith(expect.objectContaining({ firstName: 'Lucas' }))
-    // P4 — vérifier la transition vers l'étape caméra (AC Scénario 2)
-    expect(await screen.findByText(/étape caméra/i)).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /autoriser la caméra/i })).toBeInTheDocument()
+  })
+
+  it('affiche le placeholder PWA après CameraStep accordé', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
+    const mockStream = { getTracks: () => [{ stop: vi.fn() }] }
+    vi.mocked(navigator.mediaDevices.getUserMedia).mockResolvedValue(mockStream as unknown as MediaStream)
+    const { saveProfile } = await import('../lib/db/queries')
+    render(<OnboardingPage />)
+
+    await userEvent.type(screen.getByLabelText(/prénom/i), 'Lucas')
+    await userEvent.click(screen.getByRole('button', { name: /continuer/i }))
+    await waitFor(() => expect(saveProfile).toHaveBeenCalledOnce())
+
+    await userEvent.click(await screen.findByRole('button', { name: /autoriser la caméra/i }))
+    expect(await screen.findByText(/PWA/i)).toBeInTheDocument()
   })
 })

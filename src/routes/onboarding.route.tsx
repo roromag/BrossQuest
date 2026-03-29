@@ -1,8 +1,11 @@
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { saveProfile } from '../lib/db/queries'
 import { useProfileStore } from '../stores/useProfileStore'
+import { useCameraStore } from '../stores/useCameraStore'
+import { checkCameraPermission } from '../guards/CameraGuard'
+import { PermissionRecovery } from '../components/onboarding/PermissionRecovery'
 import type { Profile } from '../types/profile.types'
 
 type OnboardingStep = 'name' | 'camera' | 'pwa'
@@ -23,10 +26,81 @@ export function OnboardingPage() {
   }
 
   if (step === 'camera') {
-    return <div>Étape caméra — Story 2.2</div>
+    return <CameraStep onComplete={() => setStep('pwa')} />
+  }
+
+  if (step === 'pwa') {
+    return <div>Étape PWA — Story 2.3</div>
   }
 
   return null
+}
+
+interface CameraStepProps {
+  onComplete: () => void
+}
+
+export function CameraStep({ onComplete }: CameraStepProps) {
+  const [status, setStatus] = useState<'checking' | 'explain' | 'denied'>('checking')
+  const setPermissionState = useCameraStore(s => s.setPermissionState)
+
+  useEffect(() => {
+    checkCameraPermission().then((perm) => {
+      if (perm === 'granted') {
+        onComplete()
+      } else if (perm === 'denied') {
+        setPermissionState('denied')
+        setStatus('denied')
+      } else {
+        setStatus('explain')
+      }
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleRequest = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      stream.getTracks().forEach(t => t.stop())
+      setPermissionState('granted')
+      onComplete()
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') {
+        setPermissionState('denied')
+        setStatus('denied')
+      }
+    }
+  }
+
+  if (status === 'checking') return null
+
+  if (status === 'denied') {
+    return <PermissionRecovery onRetry={handleRequest} />
+  }
+
+  return (
+    <div className="min-h-screen bg-bg-parent flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-[390px] flex flex-col gap-10">
+        <h1 className="text-2xl font-bold text-[#EDF2F7]">
+          Autoriser la caméra
+        </h1>
+        <p className="text-sm text-[#A0AEC0]">
+          La caméra analyse le mouvement localement. Rien n'est envoyé.
+        </p>
+        <button
+          type="button"
+          onClick={handleRequest}
+          className="
+            w-full rounded-3xl py-4
+            bg-accent-cyan text-[#1E2A3A] font-semibold
+            min-h-[56px] text-base
+            transition-opacity
+          "
+        >
+          Autoriser la caméra
+        </button>
+      </div>
+    </div>
+  )
 }
 
 interface NameStepProps {
