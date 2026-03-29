@@ -1,18 +1,13 @@
 @import "tailwindcss";
 
-/*
- * Tokens design BrossQuest — définis en Epic 2+
- * Placeholder pour la structure — ne pas modifier avant Story 2.1
- *
- * @theme {
- *   --color-bg-session: #1E2A3A;
- *   --color-bg-parent: #2D3748;
- *   --color-bg-surface: #3D4F63;
- *   --color-accent-cyan: #76E4F7;
- *   --color-accent-ambre: #F6AD55;
- *   --color-accent-erreur: #FC8181;
- *   --color-anim-avant: #48BB78;
- *   --color-anim-arriere: #2D6A4F;
- *   --color-anim-micro: #F6AD55;
- * }
- */
+@theme {
+  --color-bg-session: #1E2A3A;
+  --color-bg-parent: #2D3748;
+  --color-bg-surface: #3D4F63;
+  --color-accent-cyan: #76E4F7;
+  --color-accent-ambre: #F6AD55;
+  --color-accent-erreur: #FC8181;
+  --color-anim-avant: #48BB78;
+  --color-anim-arriere: #2D6A4F;
+  --color-anim-micro: #F6AD55;
+}

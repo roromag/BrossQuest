@@ -21,6 +21,7 @@ export async function saveProfile(profile: Profile): Promise<void> {
     await db.profiles.put(profile)
   } catch (e) {
     console.error('[DB] saveProfile', e)
+    throw e
   }
 }
 

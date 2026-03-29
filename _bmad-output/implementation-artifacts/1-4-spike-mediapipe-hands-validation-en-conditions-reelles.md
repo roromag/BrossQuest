@@ -3,7 +3,7 @@
 **Epic :** 1 — Fondation technique & Spike MediaPipe
 **Story ID :** 1.4
 **Story Key :** `1-4-spike-mediapipe-hands-validation-en-conditions-reelles`
-**Status :** ready-for-dev
+**Status :** review
 **Date :** 2026-03-27
 
 ---
@@ -83,10 +83,10 @@ So that confirmer le prérequis bloquant avant tout développement fonctionnel s
   - [x] Enregistrer la route dans `src/router.ts` (sans guard)
   - [x] Afficher : état detection, qualité, fps approximatif, log des dernières valeurs velocity
 
-- [ ] T5 — Validation conditions réelles (AC: #2, #3, #6)
-  - [ ] Tester sur iPhone physique (iOS Safari) — salle de bain, éclairage standard
-  - [ ] Valider les seuils empiriques `DETECTION_THRESHOLD` et `OSCILLATION_MIN_REVERSALS`
-  - [ ] Documenter dans la section "Résultats du spike" ci-dessous
+- [x] T5 — Validation conditions réelles (AC: #2, #3, #6)
+  - [x] Tester sur iPhone physique (iOS Safari) — salle de bain, éclairage standard
+  - [x] Valider les seuils empiriques `DETECTION_THRESHOLD` et `OSCILLATION_MIN_REVERSALS`
+  - [x] Documenter dans la section "Résultats du spike" ci-dessous
 
 - [x] T6 — Vérification build + tests (AC: #5)
   - [x] `npm test` vert (logique détection + stores mis à jour)
@@ -713,47 +713,47 @@ public/
 
 ## Résultats du Spike
 
-> **À remplir après les tests en conditions réelles (T5)**
-
-**Date des tests :** _____
-**Appareil(s) utilisé(s) :** _____
-**OS / navigateur :** _____
-**Conditions :** _____
+**Date des tests :** 2026-03-29
+**Appareil(s) utilisé(s) :** iPhone 14
+**OS / navigateur :** iOS 26.3.1 — Safari
+**Conditions :** Salle de bain, éclairage standard
 
 ### Verdict
 
-- [ ] ✅ Fonctionne — Epic 3 peut démarrer
+- [x] ✅ Fonctionne — Epic 3 peut démarrer
 - [ ] ❌ Ne fonctionne pas — voir blockers ci-dessous
 
 ### Valeurs empiriques validées
 
 | Constante | Valeur initiale | Valeur retenue | Notes |
 |-----------|----------------|----------------|-------|
-| `DETECTION_THRESHOLD` | 0.012 | _____ | _____ |
-| `OSCILLATION_MIN_REVERSALS` | 2 | _____ | _____ |
+| `DETECTION_THRESHOLD` | 0.012 | **0.003** | Seuil abaissé pour meilleure réactivité — déjà mis à jour dans `detector.ts` |
+| `OSCILLATION_MIN_REVERSALS` | 2 | **2** | Valeur initiale confirmée |
 
 ### Observations
 
-_Latence réelle détection `brushing-active` : _____ ms_
-_FPS moyen sur iPhone SE 2nd gen : _____fps_
-_Consommation mémoire après 2 min : _____Mo_
+_Latence réelle détection `brushing-active` : très réactif (< 1 s confirmé)_
+_FPS moyen sur iPhone 14 : 40–50 fps_
+_Consommation mémoire après 2 min : non mesurée_
+
+**Note :** Le code a été modifié pendant le spike pour faciliter les tests — `detector.ts` expose désormais `DetectorConfig`, `getDetectorConfig()` et `setDetectorConfig()` permettant l'ajustement des seuils en temps réel depuis la page `/spike`.
 
 ### Blockers éventuels
 
-_Aucun / détailler ici_
+Aucun.
 
 ---
 
 ## Définition of Done
 
-- [ ] `npm run build` sans erreur TypeScript strict
-- [ ] `npm test` vert — logique détection + useCameraStore mis à jour
-- [ ] Aucun import `@mediapipe/tasks-vision` hors `src/lib/mediapipe/` (`grep -r "@mediapipe/tasks-vision" src/ --include="*.ts" --include="*.tsx"` → seuls les fichiers dans `src/lib/mediapipe/` apparaissent)
-- [ ] Route `/spike` accessible et fonctionnelle (detection live sur écran)
-- [ ] WASM chargé en différé (pas de fetch WASM sur `/home` ou autre route)
-- [ ] Tests en conditions réelles effectués (iPhone physique, iOS Safari)
-- [ ] Section "Résultats du spike" remplie avec valeurs empiriques
-- [ ] `useCameraStore.ts` migré vers imports types de `src/lib/mediapipe/types.ts`
+- [x] `npm run build` sans erreur TypeScript strict
+- [x] `npm test` vert — logique détection + useCameraStore mis à jour
+- [x] Aucun import `@mediapipe/tasks-vision` hors `src/lib/mediapipe/` (`grep -r "@mediapipe/tasks-vision" src/ --include="*.ts" --include="*.tsx"` → seuls les fichiers dans `src/lib/mediapipe/` apparaissent)
+- [x] Route `/spike` accessible et fonctionnelle (detection live sur écran)
+- [x] WASM chargé en différé (pas de fetch WASM sur `/home` ou autre route)
+- [x] Tests en conditions réelles effectués (iPhone physique, iOS Safari)
+- [x] Section "Résultats du spike" remplie avec valeurs empiriques
+- [x] `useCameraStore.ts` migré vers imports types de `src/lib/mediapipe/types.ts`
 
 ---
 
@@ -781,13 +781,14 @@ _Aucun blocage rencontré._
 - T2 : `src/lib/mediapipe/types.ts` créé avec les 4 types exports (`DetectionState`, `DetectionQuality`, `VelocityData`, `DetectionResult`). `useCameraStore.ts` migré (import types depuis `mediapipe/types`, + `detectionState` + `setDetectionState`). `useCameraStore.test.ts` mis à jour (+ test `detectionState` initial et `setDetectionState`).
 - T3 : `detector.ts` créé — lazy loader + pipeline détection oscillatoire. `detector.test.ts` créé — tests logique pure sans WASM.
 - T4 : `spike.route.tsx` créé — `SpikeDetectionPage` avec flux caméra, overlay detection, FPS. Enregistré dans `router.ts` sans guard.
-- T5 : **En attente de validation manuelle** sur iPhone physique (iOS Safari). Romain doit tester et remplir la section "Résultats du spike".
+- T5 : ✅ Validation effectuée sur iPhone 14 / iOS 26.3.1 / Safari — salle de bain éclairage standard. Détection très réactive, FPS 40–50. `DETECTION_THRESHOLD` calibré à `0.003` (abaissé depuis `0.012`), `OSCILLATION_MIN_REVERSALS` confirmé à `2`. `detector.ts` enrichi avec `DetectorConfig` / `getDetectorConfig()` / `setDetectorConfig()` pour tests à chaud depuis `/spike`. Epic 3 validé comme démarrable.
 - T6 : `npm test` vert (55 tests passent). `npm run build` sans erreur. Aucun import `@mediapipe/tasks-vision` hors `src/lib/mediapipe/`.
 
 ### File List
 
 - `src/lib/mediapipe/types.ts` — nouveau
-- `src/lib/mediapipe/detector.ts` — nouveau
+- `src/lib/mediapipe/types.ts` — nouveau
+- `src/lib/mediapipe/detector.ts` — nouveau + enrichi pendant spike (DetectorConfig, getDetectorConfig, setDetectorConfig ; detectionThreshold calibré à 0.003)
 - `src/lib/mediapipe/detector.test.ts` — nouveau
 - `src/routes/spike.route.tsx` — nouveau
 - `src/stores/useCameraStore.ts` — mis à jour (migration types + detectionState)
@@ -796,3 +797,12 @@ _Aucun blocage rencontré._
 - `public/mediapipe/wasm/` — nouveau (WASM assets, .gitignored)
 - `public/mediapipe/hand_landmarker.task` — nouveau (modèle ML, .gitignored)
 - `.gitignore` — mis à jour (+ exclusions mediapipe assets)
+
+---
+
+## Change Log
+
+| Date | Description |
+|------|-------------|
+| 2026-03-27 | T1–T4, T6 implémentés — installation WASM, types, détecteur, route spike, tests, build |
+| 2026-03-29 | T5 — Validation conditions réelles sur iPhone 14 / iOS 26.3.1 / Safari. DETECTION_THRESHOLD calibré à 0.003. detector.ts enrichi pour config temps réel. Story complète. |

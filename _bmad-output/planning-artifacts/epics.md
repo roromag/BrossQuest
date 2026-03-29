@@ -162,7 +162,7 @@ Un parent peut installer l'app via lien direct, créer le profil de son enfant, 
 **FRs couverts :** FR24, FR25, FR27, FR28, FR29, FR30, FR32, FR33, FR34, FR35, FR36
 
 ### Epic 3 : Session technique complète — moteur détection, nébuleuse & pipeline Avant/Pendant/Après
-Le pipeline de session complet est câblé et validé techniquement : détection MediaPipe (3 états, 8 zones, orientation), animation nébuleuse organique réactive, progression cumulative, micro-événements, sauvegarde IndexedDB temps réel, limite session/période. Une narration placeholder (Web Speech API générique) valide le pipeline Avant→Pendant→Après sans contenu éditorial final.
+Le pipeline de session complet est câblé et validé techniquement : détection MediaPipe (machine d'états 4 états : BRUSHING / DEBOUNCING / PAUSED / HAND_LOST, 8 zones, orientation), animation nébuleuse organique réactive, progression cumulative, micro-événements, sauvegarde IndexedDB temps réel, limite session/période. Une narration placeholder (Web Speech API générique) valide le pipeline Avant→Pendant→Après sans contenu éditorial final.
 **FRs couverts :** FR1, FR2, FR3, FR4, FR5, FR6, FR7, FR8, FR9, FR10, FR11, FR12, FR13, FR14, FR15, FR16, FR17, FR18, FR40
 **NFRs adressés :** NFR-P2, NFR-P3, NFR-P4, NFR-R2
 
@@ -337,7 +337,7 @@ So that mon enfant ne voie jamais une expérience brisée.
 
 ## Epic 3 : Session technique complète — moteur détection, nébuleuse & pipeline Avant/Pendant/Après
 
-Le pipeline de session complet est câblé et validé techniquement : détection MediaPipe (3 états, 8 zones, orientation), animation nébuleuse organique réactive, progression cumulative, micro-événements, sauvegarde IndexedDB temps réel, limite session/période. Une narration placeholder (Web Speech API générique) valide le pipeline Avant→Pendant→Après sans contenu éditorial final.
+Le pipeline de session complet est câblé et validé techniquement : détection MediaPipe (machine d'états 4 états : BRUSHING / DEBOUNCING / PAUSED / HAND_LOST, 8 zones, orientation), animation nébuleuse organique réactive, progression cumulative, micro-événements, sauvegarde IndexedDB temps réel, limite session/période. Une narration placeholder (Web Speech API générique) valide le pipeline Avant→Pendant→Après sans contenu éditorial final.
 
 ### Story 3.1 : Écran d'accueil atmosphérique & PulseButton
 
@@ -400,7 +400,10 @@ So that être guidé implicitement vers chaque zone sans instruction explicite.
 **Then** la nébuleuse dérive organiquement vers la position spatiale correspondante en ~3s
 **And** zones avant (1, 3, 5, 7) : nébuleuse étendue, couleur `#48BB78`, particules rapides et légères
 **And** zones arrière (2, 4, 6, 8) : nébuleuse contractée, couleur `#2D6A4F`, particules lentes et denses
-**And** `NebulaCanvas` lit `activeZone` et `velocity` via sélecteurs Zustand fins — jamais le store entier
+**And** `NebulaCanvas` lit `activeZone`, `velocity` et `detectionState` via sélecteurs Zustand fins — jamais le store entier
+**And** quand `detectionState` passe à `DEBOUNCING` ou `PAUSED` : l'animation ralentit progressivement sur `BRUSHING_CONFIG.pauseAnimationDurationMs` (2s) puis s'arrête — aucun son, aucune couleur d'alerte
+**And** quand `detectionState` repasse à `BRUSHING` (reprise) : l'animation repart depuis le début de son cycle en `BRUSHING_CONFIG.resumeAnimationDurationMs` (0.5s) — jamais depuis la position au ralenti
+**And** quand `detectionState` est `HAND_LOST` : `NebulaCanvas` reste figé à son état courant
 **And** aucune interaction tactile sur le canvas
 **And** le canvas tient ≥ 30fps sur iPhone SE 2nd gen
 
@@ -414,8 +417,11 @@ So that vivre une expérience honnête où mon geste compte vraiment.
 
 **Given** `NebulaCanvas` actif et MediaPipe WASM chargé
 **When** MediaPipe détecte un mouvement oscillatoire de la main
-**Then** `DetectionState` passe à `brushing-active` et le temps s'accumule sur `zoneProgress[activeZone]`
-**And** quand le brossage s'arrête, `DetectionState` passe à `pause` — la progression s'arrête sans réinitialisation
+**Then** `DetectionState` passe à `BRUSHING` et le temps s'accumule sur `zoneProgress[activeZone]`
+**And** quand le brossage s'arrête, `DetectionState` passe à `DEBOUNCING` — un timer de 3 secondes démarre (`BRUSHING_CONFIG.pauseThresholdMs`)
+**And** si le mouvement reprend avant 3s, `DetectionState` revient à `BRUSHING` sans comptabiliser de pause
+**And** si le timer expire, `DetectionState` passe à `PAUSED` — la progression s'arrête sans réinitialisation
+**And** si la main quitte le champ, `DetectionState` passe à `HAND_LOST` — le timer de pause est suspendu (l'enfant n'est pas pénalisé pour un problème de cadrage)
 **And** quand `zoneProgress[activeZone]` atteint `ZONE_DURATION_MS` (~15s), `useSessionStore.advanceZone()` est appelé
 **And** la latence entre début de mouvement et réaction visible est ≤ 1 seconde (NFR-P3)
 **And** `detectionQuality: 'degraded'` est exposé dans `useCameraStore` si l'éclairage ou le cadrage est insuffisant — sans interrompre la session enfant
@@ -428,12 +434,15 @@ So that être réengagé sans jamais recevoir de signal négatif.
 
 **Acceptance Criteria:**
 
-**Given** la session `'during'` active et `DetectionState` en `pause` depuis > seuil d'inattention
+**Given** la session `'during'` active et `DetectionState` en `PAUSED` depuis > seuil d'inattention
 **When** le seuil est atteint
 **Then** `NebulaCanvas` déclenche un micro-événement : contraction + teinte `#F6AD55` (ambre) pendant 800ms
 **And** le micro-événement est déclenché par `DetectionState`, pas par un timer fixe
 **And** aucun son, aucune alerte, aucun texte n'accompagne le micro-événement
 **And** si l'enfant reprend le brossage, la progression reprend exactement là où elle s'était arrêtée
+**And** quand `DetectionState` passe à `HAND_LOST` : `HandLostOverlay` apparaît en fade-in (0.5–1s) en coin d'écran — flux caméra visible, contour pulsant autour de la zone de cadrage attendue
+**And** dès re-détection de la main (`HAND_LOST` → `BRUSHING`) : `HandLostOverlay` disparaît en fade-out rapide et le brossage reprend
+**And** `HandLostOverlay` : zéro texte, zéro rouge, zéro son négatif — feedback visuel uniquement
 **And** si l'orientation du téléphone est inversée, le flux caméra est retourné automatiquement via `screen.orientation` API
 
 ### Story 3.7 : Phase Après & micro-célébration

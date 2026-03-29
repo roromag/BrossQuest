@@ -568,6 +568,7 @@ Usage limité aux écrans parent sobres : champ texte, bouton primaire, card, é
 | `EmojiPicker` | Enfant | ★★★ | Alpha |
 | `NarrativeCard` | Enfant / Parent | ★★★ | Alpha |
 | `CameraFade` | Enfant | ★★★ | Alpha |
+| `HandLostOverlay` | Enfant | ★★★ | Alpha |
 | `CelebrationOverlay` | Enfant | ★★ | Alpha |
 | `ParentAccessIcon` | Parent | ★★ | Alpha |
 | `PermissionRecovery` | Parent | ★★ | Alpha |
@@ -580,9 +581,14 @@ Usage limité aux écrans parent sobres : champ texte, bouton primaire, card, é
 Taille ≥ 120×120px. Déclenche getUserMedia au tap (requis iOS Safari).
 
 **`NebulaCanvas`** — Canvas HTML5 plein écran, système de particules.
-Inputs : zone active (1–8) · vélocité MediaPipe · état attention.
+Inputs : zone active (1–8) · vélocité MediaPipe · detectionState.
 Zones avant : #48BB78 dispersé · Zones arrière : #2D6A4F dense et contracté.
-Micro-événement inattention : teinte ambre #F6AD55 · durée 800ms.
+États :
+· BRUSHING → particules denses et rapides, animation pleine vitesse
+· DEBOUNCING / PAUSED → ralenti progressif sur 2s ("voiture qui freine"), puis arrêt
+· BRUSHING (reprise) → repart depuis le début du cycle en 0.5s — jamais depuis position au ralenti
+· HAND_LOST → canvas figé, HandLostOverlay prend le relais
+Micro-événement inattention (PAUSED > seuil) : contraction + teinte ambre #F6AD55 · 800ms.
 Zéro interaction tactile — lecture seule.
 
 **`EmojiPicker`** — Grille 4×2 · 64px · zéro texte.
@@ -594,6 +600,13 @@ Titre épisode · PulseButton centré · icône parent discrète (opacité 40%).
 **`CameraFade`** — Gère la transition flux caméra → NebulaCanvas.
 Fondu CSS ~3s · ease-in-out · libère le flux vidéo après transition complète.
 
+**`HandLostOverlay`** — Overlay caméra discret déclenché par l'état HAND_LOST.
+Flux caméra en coin d'écran (max 30% de la largeur) · contour pulsant autour de la zone de cadrage attendue.
+Fade-in 0.5–1s à l'entrée · fade-out rapide à la re-détection.
+Zéro texte · zéro rouge · zéro son négatif.
+L'enfant voit directement qu'il n'est pas cadré sans instruction explicite.
+Dès HAND_LOST → BRUSHING : overlay disparaît, NebulaCanvas reprend.
+
 ### Stratégie d'Implémentation
 
 - Composants custom construits avec les tokens Tailwind
@@ -603,7 +616,7 @@ Fondu CSS ~3s · ease-in-out · libère le flux vidéo après transition complè
 ### Roadmap d'Implémentation
 
 **Phase Alpha — Composants bloquants**
-`NebulaCanvas` · `CameraFade` · `PulseButton` · `EmojiPicker` · `NarrativeCard` · `PermissionRecovery`
+`NebulaCanvas` · `CameraFade` · `HandLostOverlay` · `PulseButton` · `EmojiPicker` · `NarrativeCard` · `PermissionRecovery`
 
 **Phase Final — Polish**
 `CelebrationOverlay` · `ProfileSettings` · `ParentAccessIcon` (simplifié en Alpha)
@@ -628,9 +641,11 @@ Le silence est un feedback valide — il encode la bienveillance absolue.
 
 | Situation | Pattern | Interdit |
 |---|---|---|
-| Brossage actif | Particules denses · NebulaCanvas | Badge, compteur, son |
-| Pause | Particules lentes · silence total | Son négatif, alerte visuelle |
-| Micro-événement | Teinte ambre #F6AD55 · 800ms | Pop-up, vibration forte |
+| BRUSHING (brossage actif) | Particules denses · NebulaCanvas pleine vitesse | Badge, compteur, son |
+| DEBOUNCING (micro-pause) | Animation ralentit progressivement sur 2s | Son négatif, alerte visuelle |
+| PAUSED (vraie pause) | Animation arrêtée · silence total | Son négatif, alerte visuelle |
+| HAND_LOST (main hors champ) | HandLostOverlay en coin · contour pulsant · timer suspendu | Rouge, texte d'erreur, son |
+| Micro-événement (PAUSED > seuil) | Contraction + teinte ambre #F6AD55 · 800ms | Pop-up, vibration forte |
 | Fin session | CelebrationOverlay proportionné | Score, étoiles, pourcentage |
 | Erreur parent | Texte + icône accent-erreur #FC8181 | Rouge vif, modale bloquante |
 | Succès onboarding | Transition visuelle douce | Toast, confetti, son |

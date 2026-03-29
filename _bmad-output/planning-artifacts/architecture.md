@@ -35,7 +35,7 @@ _Ce document se construit collaborativement étape par étape. Les sections sont
 
 | Catégorie | FRs | Implications architecturales |
 |---|---|---|
-| Détection du geste | FR1–FR8 | Moteur MediaPipe WASM, 3 états détection, adaptation orientation |
+| Détection du geste | FR1–FR8 | Moteur MediaPipe WASM, machine d'états 4 états (BRUSHING/DEBOUNCING/PAUSED/HAND_LOST), adaptation orientation |
 | Session de brossage | FR9–FR18 | getUserMedia par geste utilisateur, 3 phases, 8 zones, accumulation cumulative, limite 1 session/période |
 | Narration & Contenu | FR19–FR23 | Web Speech API, épisodes séquentiels, adaptation matin/soir |
 | Profil & Onboarding | FR24–FR32 | IndexedDB uniquement, pas de compte cloud, passage de main |
@@ -77,6 +77,8 @@ _Ce document se construit collaborativement étape par étape. Les sections sont
 | Routing persona | Routes distinctes | Frontière claire parent/enfant dans le code et les tests |
 | Limite session/période | 1 session par période (matin/soir) | Installe l'habitude, protège la rareté des épisodes |
 | Écran "déjà brossé" | Bouton pulsant absent + sous-titre | Matin : "À ce soir ✨" · Soir : "À demain ✨" |
+| Machine d'états détection | 4 états : BRUSHING → DEBOUNCING (3s timer) → PAUSED / HAND_LOST indépendant | Spike terrain : micro-immobilités → faux positifs pause ; HAND_LOST ≠ PAUSED (timer suspendu) |
+| Config brossage centralisée | `BRUSHING_CONFIG` : pauseThresholdMs, resumeAnimationDurationMs, pauseAnimationDurationMs | Ajustable sans toucher la logique — calibration post-premiers-utilisateurs |
 
 ### Modèle de Données IndexedDB
 
@@ -257,6 +259,39 @@ try {
 - **Erreurs MediaPipe :** signal `detectionQuality: 'degraded'` dans `useCameraStore` — jamais d'erreur UI enfant
 - **Guards :** résolution avant rendu — si condition échoue → redirect immédiate, jamais de rendu partiel
 
+### Machine d'États de Détection (DetectionState)
+
+4 états issus de la validation terrain du spike (2026-03-29) :
+
+| État | Description | Comportement animation |
+|---|---|---|
+| `BRUSHING` | Mouvement oscillatoire détecté | Animation NebulaCanvas active, particules denses |
+| `DEBOUNCING` | Immobilité détectée, timer 3s en cours | Animation ralentit progressivement (~2s) |
+| `PAUSED` | Timer 3s écoulé — vraie pause volontaire | Animation arrêtée, silence total |
+| `HAND_LOST` | Aucun landmark détecté (main hors champ) | Canvas figé · HandLostOverlay en coin (fade-in 0.5s) · timer de pause suspendu |
+
+**Transitions :**
+- `BRUSHING` → `DEBOUNCING` : dès immobilité détectée (timer 3s démarre)
+- `DEBOUNCING` → `BRUSHING` : mouvement détecté avant 3s (timer reset, aucune pause comptabilisée)
+- `DEBOUNCING` → `PAUSED` : timer 3s écoulé
+- `PAUSED` → `BRUSHING` : reprise immédiate dès mouvement
+- `BRUSHING` → `HAND_LOST` : aucun landmark détecté
+- `HAND_LOST` → `BRUSHING` : re-détection de la main
+
+**Règle critique :** le timer de pause NE TOURNE PAS pendant `HAND_LOST`. L'enfant n'est jamais pénalisé pour un problème de cadrage.
+
+**Config centralisée (`src/lib/mediapipe/detector.ts`) :**
+
+```typescript
+const BRUSHING_CONFIG = {
+  pauseThresholdMs: 3000,           // timer DEBOUNCING → PAUSED
+  resumeAnimationDurationMs: 500,   // reprise dynamique PAUSED → BRUSHING
+  pauseAnimationDurationMs: 2000,   // arrêt progressif DEBOUNCING
+}
+```
+
+**Composant `HandLostOverlay` :** overlay caméra discret en coin, contour pulsant, fade-in/out 0.5s. Zéro texte, zéro rouge, zéro son négatif.
+
 ### Patterns Loading State
 
 ```typescript
@@ -387,6 +422,8 @@ brossquest/
 │   │   │   ├── PulseButton.test.tsx
 │   │   │   ├── CameraFade.tsx       ← FR11 — transition caméra → nébuleuse
 │   │   │   ├── CameraFade.test.tsx
+│   │   │   ├── HandLostOverlay.tsx  ← HAND_LOST — overlay caméra en coin, contour pulsant
+│   │   │   ├── HandLostOverlay.test.tsx
 │   │   │   ├── CelebrationOverlay.tsx  ← FR15 — phase Après
 │   │   │   └── CelebrationOverlay.test.tsx
 │   │   ├── onboarding/
@@ -407,7 +444,7 @@ brossquest/
 │   │   ├── useSessionStore.test.ts
 │   │   ├── useProfileStore.ts       ← profile, onboardingComplete, isDbReady
 │   │   ├── useProfileStore.test.ts
-│   │   ├── useCameraStore.ts        ← permissionState, detectionQuality, isMediaPipeLoading
+│   │   ├── useCameraStore.ts        ← permissionState, detectionQuality, detectionState, isMediaPipeLoading
 │   │   ├── useCameraStore.test.ts
 │   │   ├── useEpisodeStore.ts       ← currentEpisode, episodeList, period
 │   │   └── useEpisodeStore.test.ts
