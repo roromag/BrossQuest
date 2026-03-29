@@ -1,4 +1,4 @@
-import { createRoute } from '@tanstack/react-router'
+import { createRoute, useNavigate } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { useState, useEffect } from 'react'
 import { saveProfile } from '../lib/db/queries'
@@ -6,6 +6,7 @@ import { useProfileStore } from '../stores/useProfileStore'
 import { useCameraStore } from '../stores/useCameraStore'
 import { checkCameraPermission } from '../guards/CameraGuard'
 import { PermissionRecovery } from '../components/onboarding/PermissionRecovery'
+import { PwaStep } from '../components/onboarding/PwaStep'
 import type { Profile } from '../types/profile.types'
 
 type OnboardingStep = 'name' | 'camera' | 'pwa'
@@ -13,6 +14,7 @@ type OnboardingStep = 'name' | 'camera' | 'pwa'
 export function OnboardingPage() {
   const [step, setStep] = useState<OnboardingStep>('name')
   const setProfile = useProfileStore(s => s.setProfile)
+  const navigate = useNavigate()
 
   if (step === 'name') {
     return (
@@ -30,7 +32,7 @@ export function OnboardingPage() {
   }
 
   if (step === 'pwa') {
-    return <div>Étape PWA — Story 2.3</div>
+    return <PwaStep onComplete={() => navigate({ to: '/handoff' })} />
   }
 
   return null

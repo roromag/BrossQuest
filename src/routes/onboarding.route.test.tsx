@@ -24,6 +24,22 @@ vi.mock('../stores/useCameraStore', () => ({
   ),
 }))
 
+const mockNavigate = vi.fn()
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/react-router')>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
+
+vi.mock('../lib/sw/usePwaInstall', () => ({
+  usePwaInstall: () => ({
+    isPromptAvailable: false,
+    promptInstall: vi.fn().mockResolvedValue('unavailable'),
+  }),
+}))
+
 import { NameStep, CameraStep, OnboardingPage } from '../routes/onboarding.route'
 
 describe('NameStep', () => {
@@ -54,7 +70,6 @@ describe('NameStep', () => {
     expect(screen.getByRole('button', { name: /continuer/i })).not.toBeDisabled()
   })
 
-  // P5 — userEvent.click au lieu de fireEvent.click
   it('appelle saveProfile + onComplete avec le profil correct', async () => {
     const { saveProfile } = await import('../lib/db/queries')
     const onComplete = vi.fn()
@@ -83,7 +98,6 @@ describe('NameStep', () => {
     expect(onComplete).not.toHaveBeenCalled()
   })
 
-  // P6 — soumission via Enter avec prénom tout-espaces
   it('bloque la soumission via Enter si le prénom est tout-espaces', async () => {
     const { saveProfile } = await import('../lib/db/queries')
     const onComplete = vi.fn()
@@ -146,7 +160,6 @@ describe('CameraStep', () => {
   })
 })
 
-// P4 — transition NameStep → CameraStep → PWA dans OnboardingPage
 describe('OnboardingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -161,7 +174,6 @@ describe('OnboardingPage', () => {
     expect(screen.getByLabelText(/prénom/i)).toBeInTheDocument()
   })
 
-  // P3 — asserter setProfile (AC Scénario 2) + transition vers caméra
   it("appelle setProfile et passe à l'étape caméra après soumission valide", async () => {
     const { checkCameraPermission } = await import('../guards/CameraGuard')
     vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
@@ -177,7 +189,7 @@ describe('OnboardingPage', () => {
     expect(await screen.findByRole('button', { name: /autoriser la caméra/i })).toBeInTheDocument()
   })
 
-  it('affiche le placeholder PWA après CameraStep accordé', async () => {
+  it('affiche PwaStep après CameraStep accordé', async () => {
     const { checkCameraPermission } = await import('../guards/CameraGuard')
     vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
     const mockStream = { getTracks: () => [{ stop: vi.fn() }] }
@@ -190,6 +202,23 @@ describe('OnboardingPage', () => {
     await waitFor(() => expect(saveProfile).toHaveBeenCalledOnce())
 
     await userEvent.click(await screen.findByRole('button', { name: /autoriser la caméra/i }))
-    expect(await screen.findByText(/PWA/i)).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /continuer sans installer/i })).toBeInTheDocument()
+  })
+
+  it('navigue vers /handoff après PwaStep.onComplete()', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
+    const mockStream = { getTracks: () => [{ stop: vi.fn() }] }
+    vi.mocked(navigator.mediaDevices.getUserMedia).mockResolvedValue(mockStream as unknown as MediaStream)
+    const { saveProfile } = await import('../lib/db/queries')
+    render(<OnboardingPage />)
+
+    await userEvent.type(screen.getByLabelText(/prénom/i), 'Lucas')
+    await userEvent.click(screen.getByRole('button', { name: /continuer/i }))
+    await waitFor(() => expect(saveProfile).toHaveBeenCalledOnce())
+
+    await userEvent.click(await screen.findByRole('button', { name: /autoriser la caméra/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /continuer sans installer/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/handoff' })
   })
 })
