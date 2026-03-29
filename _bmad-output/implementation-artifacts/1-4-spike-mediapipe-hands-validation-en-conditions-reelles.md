@@ -62,36 +62,36 @@ So that confirmer le prérequis bloquant avant tout développement fonctionnel s
 
 ## Tasks / Subtasks
 
-- [ ] T1 — Installation package et WASM (AC: #4, #5)
-  - [ ] `npm install @mediapipe/tasks-vision`
-  - [ ] Télécharger `hand_landmarker.task` → `public/mediapipe/hand_landmarker.task`
-  - [ ] Copier les fichiers WASM dans `public/mediapipe/wasm/` (voir section Dev Notes)
-  - [ ] Vérifier que `vite.config.ts` cache `**/*.wasm` via Workbox (déjà configuré)
+- [x] T1 — Installation package et WASM (AC: #4, #5)
+  - [x] `npm install @mediapipe/tasks-vision`
+  - [x] Télécharger `hand_landmarker.task` → `public/mediapipe/hand_landmarker.task`
+  - [x] Copier les fichiers WASM dans `public/mediapipe/wasm/` (voir section Dev Notes)
+  - [x] Vérifier que `vite.config.ts` cache `**/*.wasm` via Workbox (déjà configuré)
 
-- [ ] T2 — Types MediaPipe (AC: #5)
-  - [ ] Créer `src/lib/mediapipe/types.ts` avec `DetectionState`, `DetectionQuality`, `DetectionResult`, `VelocityData`
-  - [ ] Mettre à jour `src/stores/useCameraStore.ts` pour importer `DetectionQuality` et `DetectionState` depuis `src/lib/mediapipe/types.ts` (migration depuis type local)
-  - [ ] Ajouter `detectionState: DetectionState` dans `useCameraStore`
+- [x] T2 — Types MediaPipe (AC: #5)
+  - [x] Créer `src/lib/mediapipe/types.ts` avec `DetectionState`, `DetectionQuality`, `DetectionResult`, `VelocityData`
+  - [x] Mettre à jour `src/stores/useCameraStore.ts` pour importer `DetectionQuality` et `DetectionState` depuis `src/lib/mediapipe/types.ts` (migration depuis type local)
+  - [x] Ajouter `detectionState: DetectionState` dans `useCameraStore`
 
-- [ ] T3 — Détecteur MediaPipe (AC: #2, #3, #4)
-  - [ ] Créer `src/lib/mediapipe/detector.ts` — lazy loader + pipeline détection
-  - [ ] Implémenter algorithme détection mouvement oscillatoire
-  - [ ] Créer `src/lib/mediapipe/detector.test.ts` — tests logique détection (sans WASM réel)
+- [x] T3 — Détecteur MediaPipe (AC: #2, #3, #4)
+  - [x] Créer `src/lib/mediapipe/detector.ts` — lazy loader + pipeline détection
+  - [x] Implémenter algorithme détection mouvement oscillatoire
+  - [x] Créer `src/lib/mediapipe/detector.test.ts` — tests logique détection (sans WASM réel)
 
-- [ ] T4 — Route spike (AC: #1)
-  - [ ] Créer `src/routes/spike.route.tsx` — composant `SpikeDetectionPage`
-  - [ ] Enregistrer la route dans `src/router.ts` (sans guard)
-  - [ ] Afficher : état detection, qualité, fps approximatif, log des dernières valeurs velocity
+- [x] T4 — Route spike (AC: #1)
+  - [x] Créer `src/routes/spike.route.tsx` — composant `SpikeDetectionPage`
+  - [x] Enregistrer la route dans `src/router.ts` (sans guard)
+  - [x] Afficher : état detection, qualité, fps approximatif, log des dernières valeurs velocity
 
 - [ ] T5 — Validation conditions réelles (AC: #2, #3, #6)
   - [ ] Tester sur iPhone physique (iOS Safari) — salle de bain, éclairage standard
   - [ ] Valider les seuils empiriques `DETECTION_THRESHOLD` et `OSCILLATION_MIN_REVERSALS`
   - [ ] Documenter dans la section "Résultats du spike" ci-dessous
 
-- [ ] T6 — Vérification build + tests (AC: #5)
-  - [ ] `npm test` vert (logique détection + stores mis à jour)
-  - [ ] `npm run build` sans erreur TypeScript strict
-  - [ ] Vérifier qu'aucun import `@mediapipe/tasks-vision` n'existe hors `src/lib/mediapipe/`
+- [x] T6 — Vérification build + tests (AC: #5)
+  - [x] `npm test` vert (logique détection + stores mis à jour)
+  - [x] `npm run build` sans erreur TypeScript strict
+  - [x] Vérifier qu'aucun import `@mediapipe/tasks-vision` n'existe hors `src/lib/mediapipe/`
 
 ---
 
@@ -769,7 +769,7 @@ _Aucun / détailler ici_
 
 ### Agent Model Used
 
-_À remplir_
+claude-sonnet-4-6
 
 ### Debug Log References
 
@@ -777,8 +777,22 @@ _Aucun blocage rencontré._
 
 ### Completion Notes List
 
-_À remplir_
+- T1 : `@mediapipe/tasks-vision` installé. WASM copié dans `public/mediapipe/wasm/`. Modèle `hand_landmarker.task` (~7.5 Mo) téléchargé. Ajouté au `.gitignore`. Workbox déjà configuré pour `**/*.wasm`.
+- T2 : `src/lib/mediapipe/types.ts` créé avec les 4 types exports (`DetectionState`, `DetectionQuality`, `VelocityData`, `DetectionResult`). `useCameraStore.ts` migré (import types depuis `mediapipe/types`, + `detectionState` + `setDetectionState`). `useCameraStore.test.ts` mis à jour (+ test `detectionState` initial et `setDetectionState`).
+- T3 : `detector.ts` créé — lazy loader + pipeline détection oscillatoire. `detector.test.ts` créé — tests logique pure sans WASM.
+- T4 : `spike.route.tsx` créé — `SpikeDetectionPage` avec flux caméra, overlay detection, FPS. Enregistré dans `router.ts` sans guard.
+- T5 : **En attente de validation manuelle** sur iPhone physique (iOS Safari). Romain doit tester et remplir la section "Résultats du spike".
+- T6 : `npm test` vert (55 tests passent). `npm run build` sans erreur. Aucun import `@mediapipe/tasks-vision` hors `src/lib/mediapipe/`.
 
 ### File List
 
-_À remplir_
+- `src/lib/mediapipe/types.ts` — nouveau
+- `src/lib/mediapipe/detector.ts` — nouveau
+- `src/lib/mediapipe/detector.test.ts` — nouveau
+- `src/routes/spike.route.tsx` — nouveau
+- `src/stores/useCameraStore.ts` — mis à jour (migration types + detectionState)
+- `src/stores/useCameraStore.test.ts` — mis à jour (+ tests detectionState)
+- `src/router.ts` — mis à jour (+ spikeRoute)
+- `public/mediapipe/wasm/` — nouveau (WASM assets, .gitignored)
+- `public/mediapipe/hand_landmarker.task` — nouveau (modèle ML, .gitignored)
+- `.gitignore` — mis à jour (+ exclusions mediapipe assets)

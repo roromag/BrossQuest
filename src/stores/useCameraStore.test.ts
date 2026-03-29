@@ -6,6 +6,7 @@ describe('useCameraStore', () => {
     useCameraStore.setState({
       permissionState: 'prompt',
       detectionQuality: 'absent',
+      detectionState: 'absent',
       isMediaPipeLoading: false,
     })
   })
@@ -14,6 +15,7 @@ describe('useCameraStore', () => {
     const s = useCameraStore.getState()
     expect(s.permissionState).toBe('prompt')
     expect(s.detectionQuality).toBe('absent')
+    expect(s.detectionState).toBe('absent')
     expect(s.isMediaPipeLoading).toBe(false)
   })
 
@@ -25,6 +27,11 @@ describe('useCameraStore', () => {
   it('setDetectionQuality met à jour detectionQuality', () => {
     useCameraStore.getState().setDetectionQuality('good')
     expect(useCameraStore.getState().detectionQuality).toBe('good')
+  })
+
+  it('setDetectionState met à jour detectionState', () => {
+    useCameraStore.getState().setDetectionState('brushing-active')
+    expect(useCameraStore.getState().detectionState).toBe('brushing-active')
   })
 
   it('setMediaPipeLoading met à jour isMediaPipeLoading', () => {

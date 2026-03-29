@@ -36,3 +36,9 @@ build/
 # =============================================
 .env.local
 *.tsbuildinfo
+
+# =============================================
+# MediaPipe assets (trop lourds pour git)
+# =============================================
+public/mediapipe/hand_landmarker.task
+public/mediapipe/wasm/

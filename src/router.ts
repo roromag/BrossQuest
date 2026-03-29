@@ -7,6 +7,7 @@ import { sessionRoute } from './routes/session.route'
 import { parentRoute } from './routes/parent.route'
 import { recoveryCameraRoute } from './routes/recovery.camera.route'
 import { recoveryProfileRoute } from './routes/recovery.profile.route'
+import { spikeRoute } from './routes/spike.route'
 
 // Routes protégées par ProfileGuard (onboarding requis) → home, session, handoff, parent
 // Routes protégées par CameraGuard (permission caméra) → home, session
@@ -27,6 +28,7 @@ const routeTree = rootRoute.addChildren([
   parentRoute,
   recoveryCameraRoute,
   recoveryProfileRoute,
+  spikeRoute,
 ])
 
 export const router = createRouter({
