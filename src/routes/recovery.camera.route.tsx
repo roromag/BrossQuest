@@ -3,18 +3,19 @@ import { rootRoute } from './__root'
 import { PermissionRecovery } from '../components/onboarding/PermissionRecovery'
 import { useCameraStore } from '../stores/useCameraStore'
 
-function RecoveryCameraPage() {
+export function RecoveryCameraPage() {
   const navigate = useNavigate()
   const setPermissionState = useCameraStore(s => s.setPermissionState)
 
   const handleRetry = async () => {
+    if (!navigator.mediaDevices) return
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true })
       stream.getTracks().forEach(t => t.stop())
       setPermissionState('granted')
       navigate({ to: '/home' })
     } catch {
-      // Toujours refusé — PermissionRecovery reste affiché
+      // Permission refusée ou erreur matérielle — PermissionRecovery reste affiché
     }
   }
 

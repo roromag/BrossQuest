@@ -44,10 +44,13 @@ export function PermissionRecovery({ onRetry }: PermissionRecoveryProps) {
           </p>
         </div>
 
-        <ol className="flex flex-col gap-3">
+        <ol
+          aria-label="Étapes pour autoriser l'accès à la caméra"
+          className="list-none flex flex-col gap-3"
+        >
           {steps.map((step, i) => (
-            <li key={i} className="flex gap-3 items-start">
-              <span className="text-accent-cyan font-bold min-w-[1.5rem]">{i + 1}.</span>
+            <li key={step} className="flex gap-3 items-start">
+              <span aria-hidden="true" className="text-accent-cyan font-bold min-w-[1.5rem]">{i + 1}.</span>
               <span className="text-sm text-[#EDF2F7]">{step}</span>
             </li>
           ))}
@@ -60,6 +63,7 @@ export function PermissionRecovery({ onRetry }: PermissionRecoveryProps) {
             w-full rounded-3xl py-4
             bg-accent-cyan text-[#1E2A3A] font-semibold
             min-h-[56px] text-base
+            hover:opacity-80 active:opacity-70
             transition-opacity
           "
         >

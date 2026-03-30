@@ -19,9 +19,12 @@ export function PwaStep({ onComplete }: PwaStepProps) {
 
   const handleInstall = async () => {
     setInstalling(true)
-    await promptInstall()
-    setInstalling(false)
-    onComplete()
+    try {
+      await promptInstall()
+    } finally {
+      setInstalling(false)
+      onComplete()
+    }
   }
 
   return (
@@ -35,9 +38,10 @@ export function PwaStep({ onComplete }: PwaStepProps) {
         </p>
 
         {os === 'ios' && <IosInstructions />}
-        {os !== 'ios' && !isPromptAvailable && <AndroidManualInstructions />}
+        {os === 'android' && !isPromptAvailable && <AndroidManualInstructions />}
+        {os === 'other' && <DesktopMessage />}
 
-        {os !== 'ios' && isPromptAvailable && (
+        {os === 'android' && isPromptAvailable && (
           <button
             type="button"
             onClick={handleInstall}
@@ -79,7 +83,7 @@ function IosInstructions() {
         'Descends et appuie sur "Sur l\'écran d\'accueil"',
         'Appuie sur "Ajouter"',
       ].map((step, i) => (
-        <li key={i} className="flex gap-3 items-start">
+        <li key={step} className="flex gap-3 items-start">
           <span className="text-accent-cyan font-bold min-w-[1.5rem]">{i + 1}.</span>
           <span className="text-sm text-[#EDF2F7]">{step}</span>
         </li>
@@ -96,11 +100,19 @@ function AndroidManualInstructions() {
         'Appuie sur "Ajouter à l\'écran d\'accueil"',
         'Appuie sur "Ajouter"',
       ].map((step, i) => (
-        <li key={i} className="flex gap-3 items-start">
+        <li key={step} className="flex gap-3 items-start">
           <span className="text-accent-cyan font-bold min-w-[1.5rem]">{i + 1}.</span>
           <span className="text-sm text-[#EDF2F7]">{step}</span>
         </li>
       ))}
     </ol>
+  )
+}
+
+function DesktopMessage() {
+  return (
+    <p className="text-sm text-[#A0AEC0]">
+      Cette app est conçue pour mobile. Ouvre-la depuis Safari (iOS) ou Chrome (Android) pour l&apos;installer sur l&apos;écran d&apos;accueil.
+    </p>
   )
 }

@@ -109,6 +109,31 @@ describe('NameStep', () => {
     expect(saveProfile).not.toHaveBeenCalled()
     expect(onComplete).not.toHaveBeenCalled()
   })
+
+  it('rejette un prénom composé uniquement de caractères zero-width', async () => {
+    const { saveProfile } = await import('../lib/db/queries')
+    const onComplete = vi.fn()
+    render(<NameStep onComplete={onComplete} />)
+
+    fireEvent.change(screen.getByLabelText(/prénom/i), { target: { value: '\u200B\u200C\u200D' } })
+    expect(screen.getByRole('button', { name: /continuer/i })).toBeDisabled()
+    expect(saveProfile).not.toHaveBeenCalled()
+    expect(onComplete).not.toHaveBeenCalled()
+  })
+
+  it("affiche le message d'erreur si saveProfile rejette", async () => {
+    const { saveProfile } = await import('../lib/db/queries')
+    vi.mocked(saveProfile).mockRejectedValueOnce(new Error('DB error'))
+    const onComplete = vi.fn()
+    render(<NameStep onComplete={onComplete} />)
+
+    await userEvent.type(screen.getByLabelText(/prénom/i), 'Lucas')
+    await userEvent.click(screen.getByRole('button', { name: /continuer/i }))
+
+    expect(await screen.findByText(/erreur est survenue/i)).toBeInTheDocument()
+    expect(onComplete).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /continuer/i })).not.toBeDisabled()
+  })
 })
 
 describe('CameraStep', () => {
@@ -158,6 +183,25 @@ describe('CameraStep', () => {
     expect(await screen.findByRole('button', { name: /j'ai autorisé/i })).toBeInTheDocument()
     expect(mockSetPermissionState).toHaveBeenCalledWith('denied')
   })
+
+  it('reste sur la vue explain si getUserMedia échoue avec une erreur non-permission', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockResolvedValue('prompt')
+    const error = new DOMException('No camera found', 'NotFoundError')
+    vi.mocked(navigator.mediaDevices.getUserMedia).mockRejectedValue(error)
+    render(<CameraStep onComplete={vi.fn()} />)
+    await userEvent.click(await screen.findByRole('button', { name: /autoriser la caméra/i }))
+    expect(await screen.findByRole('button', { name: /autoriser la caméra/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /j'ai autorisé/i })).not.toBeInTheDocument()
+    expect(mockSetPermissionState).not.toHaveBeenCalled()
+  })
+
+  it('reste sur la vue explain si checkCameraPermission rejette', async () => {
+    const { checkCameraPermission } = await import('../guards/CameraGuard')
+    vi.mocked(checkCameraPermission).mockRejectedValue(new Error('API unavailable'))
+    render(<CameraStep onComplete={vi.fn()} />)
+    expect(await screen.findByRole('button', { name: /autoriser la caméra/i })).toBeInTheDocument()
+  })
 })
 
 describe('OnboardingPage', () => {
@@ -172,6 +216,19 @@ describe('OnboardingPage', () => {
   it('affiche le champ prénom au premier rendu', () => {
     render(<OnboardingPage />)
     expect(screen.getByLabelText(/prénom/i)).toBeInTheDocument()
+  })
+
+  it("reste sur l'étape prénom si saveProfile rejette", async () => {
+    const { saveProfile } = await import('../lib/db/queries')
+    vi.mocked(saveProfile).mockRejectedValueOnce(new Error('DB error'))
+    render(<OnboardingPage />)
+
+    await userEvent.type(screen.getByLabelText(/prénom/i), 'Lucas')
+    await userEvent.click(screen.getByRole('button', { name: /continuer/i }))
+
+    expect(await screen.findByText(/erreur est survenue/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/prénom/i)).toBeInTheDocument()
+    expect(mockSetProfile).not.toHaveBeenCalled()
   })
 
   it("appelle setProfile et passe à l'étape caméra après soumission valide", async () => {

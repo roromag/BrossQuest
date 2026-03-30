@@ -1,6 +1,6 @@
 import { createRoute, useNavigate } from '@tanstack/react-router'
 import { rootRoute } from './__root'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { saveProfile } from '../lib/db/queries'
 import { useProfileStore } from '../stores/useProfileStore'
 import { useCameraStore } from '../stores/useCameraStore'
@@ -44,32 +44,46 @@ interface CameraStepProps {
 
 export function CameraStep({ onComplete }: CameraStepProps) {
   const [status, setStatus] = useState<'checking' | 'explain' | 'denied'>('checking')
+  const [isRequesting, setIsRequesting] = useState(false)
   const setPermissionState = useCameraStore(s => s.setPermissionState)
+  const onCompleteRef = useRef(onComplete)
+  onCompleteRef.current = onComplete
 
   useEffect(() => {
-    checkCameraPermission().then((perm) => {
-      if (perm === 'granted') {
-        onComplete()
-      } else if (perm === 'denied') {
+    let active = true
+    checkCameraPermission()
+      .then((perm) => {
+        if (!active) return
+        if (perm === 'granted') {
+          onCompleteRef.current()
+        } else if (perm === 'denied') {
+          setPermissionState('denied')
+          setStatus('denied')
+        } else {
+          setStatus('explain')
+        }
+      })
+      .catch(() => { if (active) setStatus('explain') })
+    return () => { active = false }
+  }, [setPermissionState])
+
+  const handleRequest = async () => {
+    if (isRequesting) return
+    setIsRequesting(true)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      stream.getTracks().forEach(t => t.stop())
+      setPermissionState('granted')
+      onCompleteRef.current()
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') {
         setPermissionState('denied')
         setStatus('denied')
       } else {
         setStatus('explain')
       }
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleRequest = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-      stream.getTracks().forEach(t => t.stop())
-      setPermissionState('granted')
-      onComplete()
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'NotAllowedError') {
-        setPermissionState('denied')
-        setStatus('denied')
-      }
+    } finally {
+      setIsRequesting(false)
     }
   }
 
@@ -91,10 +105,12 @@ export function CameraStep({ onComplete }: CameraStepProps) {
         <button
           type="button"
           onClick={handleRequest}
+          disabled={isRequesting}
           className="
             w-full rounded-3xl py-4
             bg-accent-cyan text-[#1E2A3A] font-semibold
             min-h-[56px] text-base
+            disabled:opacity-40 disabled:cursor-not-allowed
             transition-opacity
           "
         >
@@ -115,7 +131,7 @@ export function NameStep({ onComplete }: NameStepProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [saveError, setSaveError] = useState(false)
 
-  const trimmed = firstName.trim()
+  const trimmed = firstName.replace(/[\u200B\u200C\u200D\uFEFF]/g, '').trim()
   const isValid = trimmed.length > 0
   const showError = touched && !isValid
 

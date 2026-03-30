@@ -535,14 +535,16 @@ Aucun blocage — implémentation directe conforme aux specs.
 - `OnboardingPage` mis à jour : étape `'pwa'` ajoutée avec placeholder `<div>Étape PWA — Story 2.3</div>`
 - `recovery.camera.route.tsx` remplace son placeholder par `PermissionRecovery` avec `onRetry` qui recheck via `getUserMedia` et navigue vers `/home` si accordé
 - 72 tests passent (12 fichiers), build TypeScript strict sans erreur
+- 2026-03-30 : Corrections code review — P-1 à P-9 adressés : gestion erreurs non-NotAllowedError, rejet checkCameraPermission, stale closure useRef, isRequesting guard, navigator.mediaDevices guard, cleanup unmount, tests RecoveryCameraPage, transition-opacity CSS, accessibilité ol — 89 tests verts, build OK (Dev Agent)
 
 ### File List
 
-- `src/components/onboarding/PermissionRecovery.tsx` — CRÉÉ
+- `src/components/onboarding/PermissionRecovery.tsx` — CRÉÉ / MODIFIÉ (a11y, CSS)
 - `src/components/onboarding/PermissionRecovery.test.tsx` — CRÉÉ
 - `src/routes/onboarding.route.tsx` — MODIFIÉ
 - `src/routes/onboarding.route.test.tsx` — MODIFIÉ
-- `src/routes/recovery.camera.route.tsx` — MODIFIÉ
+- `src/routes/recovery.camera.route.tsx` — MODIFIÉ (export, guard mediaDevices)
+- `src/routes/recovery.camera.route.test.tsx` — CRÉÉ
 
 ---
 
@@ -550,3 +552,4 @@ Aucun blocage — implémentation directe conforme aux specs.
 
 - 2026-03-29 : Création story 2.2 — demande et gestion permission caméra (SM Agent)
 - 2026-03-29 : Implémentation complète — PermissionRecovery, CameraStep, RecoveryCameraPage, 72 tests verts, build OK (Dev Agent)
+- 2026-03-30 : Corrections post-review — 9 patches appliqués, 89 tests verts, build OK (Dev Agent)
