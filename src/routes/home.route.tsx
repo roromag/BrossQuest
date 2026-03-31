@@ -1,6 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router'
 import { rootRoute } from './__root'
-import { checkOnboardingComplete } from '../guards/ProfileGuard'
+import { checkProfileStatus } from '../guards/ProfileGuard'
 import { checkCameraPermission } from '../guards/CameraGuard'
 import { getCompletedSessionForCurrentPeriod, getCurrentPeriod } from '../guards/SessionPeriodGuard'
 
@@ -17,11 +17,12 @@ export const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/home',
   beforeLoad: async () => {
-    const [onboarded, camPerm] = await Promise.all([
-      checkOnboardingComplete(),
+    const [profileStatus, camPerm] = await Promise.all([
+      checkProfileStatus(),
       checkCameraPermission(),
     ])
-    if (!onboarded) throw redirect({ to: '/onboarding' })
+    if (profileStatus === 'recovery') throw redirect({ to: '/recovery/profile' })
+    if (profileStatus === 'mid-onboarding') throw redirect({ to: '/onboarding' })
     if (camPerm === 'denied') throw redirect({ to: '/recovery/camera' })
   },
   loader: async () => {

@@ -333,6 +333,27 @@ So that mon enfant ne voie jamais une expérience brisée.
 **And** après récupération, `Profile.onboardingComplete = true` est restauré et l'app reprend normalement depuis `/home`
 **And** le message affiché est bienveillant et explicatif — pas un message d'erreur technique
 
+### Story 2.6 : Écran de bascule parent → enfant avec animation d'apparition des emojis
+
+As a parent,
+I want voir un écran de bascule avant que l'enfant choisisse son emoji,
+So that je puisse lui expliquer ce qu'il va faire et lui tendre le téléphone au bon moment.
+
+**Acceptance Criteria:**
+
+**Given** l'onboarding parent complété (Stories 2.1–2.4) et la route `/handoff` affichée
+**When** l'écran se charge
+**Then** le message "Quel emoji pour accueillir [Prénom] ?" s'affiche avec le prénom réel de l'enfant
+**And** un bouton "Choisir mon emoji" est visible — la grille EmojiPicker n'est pas encore affichée
+
+**Given** l'écran de bascule affiché
+**When** l'utilisateur appuie sur "Choisir mon emoji"
+**Then** la grille EmojiPicker apparaît avec une animation douce et staggerée (scale 0→1, cubic-bezier spring, 50ms de délai entre chaque emoji, CSS pur sans dépendance externe)
+
+**Given** la grille animée affichée
+**When** l'enfant sélectionne un emoji
+**Then** le comportement Story 2.4 s'exécute : saveProfile, setProfile, navigation vers /home
+
 ---
 
 ## Epic 3 : Session technique complète — moteur détection, nébuleuse & pipeline Avant/Pendant/Après
