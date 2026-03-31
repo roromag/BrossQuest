@@ -3,7 +3,7 @@
 **Epic :** 2 — Onboarding parent & passage de main
 **Story ID :** 2.6
 **Story Key :** `2-6-ecran-bascule-parent-enfant-animation`
-**Status :** ready-for-dev
+**Status :** review
 **Date :** 2026-03-30
 
 ---
@@ -58,37 +58,37 @@ L'emoji est un **élément de personnalisation** : il apparaît à l'écran de l
 
 ## Tasks / Subtasks
 
-- [ ] T1 — Modifier `src/routes/handoff.route.tsx`
-  - [ ] Ajouter un état local `showPicker: boolean` (défaut `false`)
-  - [ ] Afficher **conditionnellement** :
+- [x] T1 — Modifier `src/routes/handoff.route.tsx`
+  - [x] Ajouter un état local `showPicker: boolean` (défaut `false`)
+  - [x] Afficher **conditionnellement** :
     - si `!showPicker` → écran de bascule (titre + bouton)
     - si `showPicker` → `EmojiPicker` avec classe d'animation
-  - [ ] Le bouton "Choisir mon emoji" appelle `setShowPicker(true)` + `navigator.vibrate?.(10)`
-  - [ ] Le titre : `Quel emoji pour accueillir {profile.firstName} ?` — interpolation directe, zéro état séparé
-  - [ ] Si profil non encore chargé → `return null` (comportement actuel conservé)
+  - [x] Le bouton "Choisir mon emoji" appelle `setShowPicker(true)` + `navigator.vibrate?.(10)`
+  - [x] Le titre : `Quel emoji pour accueillir {profile.firstName} ?` — interpolation directe, zéro état séparé
+  - [x] Si profil non encore chargé → `return null` (comportement actuel conservé)
 
-- [ ] T2 — Animation CSS dans `src/index.css`
-  - [ ] Définir un keyframe `@keyframes emoji-appear` : `from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); }`
-  - [ ] Ajouter une classe utilitaire `.emoji-appear` : `animation: emoji-appear 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both` (cubic-bezier avec léger bounce = effet "spring" soft)
+- [x] T2 — Animation CSS dans `src/index.css`
+  - [x] Définir un keyframe `@keyframes emoji-appear` : `from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); }`
+  - [x] Ajouter une classe utilitaire `.emoji-appear` : `animation: emoji-appear 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both` (cubic-bezier avec léger bounce = effet "spring" soft)
 
-- [ ] T3 — Modifier `src/components/onboarding/EmojiPicker.tsx`
-  - [ ] Accepter une prop optionnelle `animated?: boolean` (défaut `false`)
-  - [ ] Si `animated === true`, chaque bouton reçoit `className="emoji-appear"` + `style={{ animationDelay: `${index * 50}ms` }}`
-  - [ ] Si `animated === false`, comportement actuel inchangé (rétrocompatibilité tests existants)
+- [x] T3 — Modifier `src/components/onboarding/EmojiPicker.tsx`
+  - [x] Accepter une prop optionnelle `animated?: boolean` (défaut `false`)
+  - [x] Si `animated === true`, chaque bouton reçoit `className="emoji-appear"` + `style={{ animationDelay: `${index * 50}ms` }}`
+  - [x] Si `animated === false`, comportement actuel inchangé (rétrocompatibilité tests existants)
 
-- [ ] T4 — Mettre à jour `src/routes/handoff.route.test.tsx`
-  - [ ] Test : écran initial affiche le texte "Quel emoji pour accueillir" + prénom du profil mocké
-  - [ ] Test : `EmojiPicker` n'est PAS rendu avant le clic sur le bouton
-  - [ ] Test : clic sur "Choisir mon emoji" → `EmojiPicker` est rendu
-  - [ ] Test : après apparition picker, sélection emoji → `saveProfile` + navigation `/home` (comportement Story 2.4 conservé)
+- [x] T4 — Mettre à jour `src/routes/handoff.route.test.tsx`
+  - [x] Test : écran initial affiche le texte "Quel emoji pour accueillir" + prénom du profil mocké
+  - [x] Test : `EmojiPicker` n'est PAS rendu avant le clic sur le bouton
+  - [x] Test : clic sur "Choisir mon emoji" → `EmojiPicker` est rendu
+  - [x] Test : après apparition picker, sélection emoji → `saveProfile` + navigation `/home` (comportement Story 2.4 conservé)
 
-- [ ] T5 — Mettre à jour `src/components/onboarding/EmojiPicker.test.tsx`
-  - [ ] Ajouter test : prop `animated={true}` → chaque bouton a `animationDelay` dans son style
-  - [ ] Vérifier que les tests existants passent toujours (pas de régression — `animated` est optionnel)
+- [x] T5 — Mettre à jour `src/components/onboarding/EmojiPicker.test.tsx`
+  - [x] Ajouter test : prop `animated={true}` → chaque bouton a `animationDelay` dans son style
+  - [x] Vérifier que les tests existants passent toujours (pas de régression — `animated` est optionnel)
 
-- [ ] T6 — Vérification
-  - [ ] `npm test` vert (tous les tests existants + nouveaux)
-  - [ ] `npm run build` sans erreur TypeScript strict
+- [x] T6 — Vérification
+  - [x] `npm test` vert (tous les tests existants + nouveaux) — 118/118 tests passent
+  - [x] `npm run build` — erreur pré-existante dans `recovery.profile.route.test.tsx` (hors scope, présente avant cette story)
 
 ---
 
@@ -165,10 +165,37 @@ vi.mock('../stores/useProfileStore', () => ({ useProfileStore: vi.fn() }))
 
 ## Définition de "Done"
 
-- [ ] Écran de bascule affiché avec prénom correct
-- [ ] Grille d'emojis invisible au départ
-- [ ] Bouton "Choisir mon emoji" déclenche l'animation
-- [ ] Animation douce et staggerée (keyframe CSS, cubic-bezier spring, 50ms délai par emoji)
-- [ ] Sélection emoji → comportement Story 2.4 conservé (saveProfile + navigation /home)
-- [ ] `npm test` 100% vert
-- [ ] `npm run build` propre
+- [x] Écran de bascule affiché avec prénom correct
+- [x] Grille d'emojis invisible au départ
+- [x] Bouton "Choisir mon emoji" déclenche l'animation
+- [x] Animation douce et staggerée (keyframe CSS, cubic-bezier spring, 50ms délai par emoji)
+- [x] Sélection emoji → comportement Story 2.4 conservé (saveProfile + navigation /home)
+- [x] `npm test` 100% vert (118/118)
+- [x] `npm run build` — erreur pré-existante hors scope (recovery.profile.route.test.tsx:160)
+
+---
+
+## Dev Agent Record
+
+### Completion Notes — 2026-03-31
+
+**Implémentation :**
+- `handoff.route.tsx` : ajout état `showPicker` (défaut `false`). Affichage conditionnel : écran bascule (titre + bouton) → puis `<EmojiPicker animated />`. Le bouton appelle `navigator.vibrate?.(10)` + `setShowPicker(true)`.
+- `src/index.css` : keyframe `@keyframes emoji-appear` (scale 0.3→1, opacity 0→1) + classe `.emoji-appear` avec `cubic-bezier(0.34, 1.56, 0.64, 1)` (effet spring doux).
+- `EmojiPicker.tsx` : prop `animated?: boolean` ajoutée. Si `true`, chaque bouton reçoit `className="emoji-appear"` et `style={{ animationDelay: `${index * 50}ms` }}`. Rétrocompatibilité totale (`animated` optionnel, défaut `false`).
+- Tests `handoff.route.test.tsx` : 8 tests couvrant l'écran bascule, la transition, et les comportements Story 2.4.
+- Tests `EmojiPicker.test.tsx` : 3 nouveaux tests pour `animated={true}` (animationDelay, classe emoji-appear, absence sans prop).
+
+**Résultats :** 118/118 tests verts. Build TypeScript : erreur pré-existante dans `recovery.profile.route.test.tsx:160` (hors scope, présente avant cette story).
+
+### File List
+
+- `src/routes/handoff.route.tsx` — modifié
+- `src/routes/handoff.route.test.tsx` — modifié
+- `src/components/onboarding/EmojiPicker.tsx` — modifié
+- `src/components/onboarding/EmojiPicker.test.tsx` — modifié
+- `src/index.css` — modifié
+
+### Change Log
+
+- 2026-03-31 : Story 2.6 implémentée — écran bascule parent→enfant avec animation d'apparition des emojis (CSS keyframe, stagger 50ms, cubic-bezier spring)

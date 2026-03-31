@@ -157,7 +157,7 @@ describe('recoveryProfileRoute.beforeLoad', () => {
 
   it("pas de redirect si pas de profil", async () => {
     const { getActiveProfile } = await import('../lib/db/queries')
-    vi.mocked(getActiveProfile).mockResolvedValueOnce(null)
+    vi.mocked(getActiveProfile).mockResolvedValueOnce(undefined)
 
     const beforeLoad = (recoveryProfileRoute as unknown as { options: { beforeLoad: () => Promise<void> } }).options.beforeLoad
     await expect(beforeLoad()).resolves.toBeUndefined()

@@ -43,4 +43,32 @@ describe('EmojiPicker', () => {
     await userEvent.click(screen.getByRole('button', { name: '🐻' }))
     expect(navigator.vibrate).toHaveBeenCalledWith(10)
   })
+
+  // ── prop animated ─────────────────────────────────────────────────────────
+
+  it('prop animated={true} → chaque bouton a animationDelay dans son style', () => {
+    render(<EmojiPicker onSelect={vi.fn()} animated />)
+    const buttons = screen.getAllByRole('button')
+    expect(buttons).toHaveLength(8)
+    buttons.forEach((btn, index) => {
+      expect(btn).toHaveStyle({ animationDelay: `${index * 50}ms` })
+    })
+  })
+
+  it('prop animated={true} → chaque bouton a la classe emoji-appear', () => {
+    render(<EmojiPicker onSelect={vi.fn()} animated />)
+    const buttons = screen.getAllByRole('button')
+    buttons.forEach((btn) => {
+      expect(btn.className).toContain('emoji-appear')
+    })
+  })
+
+  it('sans prop animated → aucun bouton n\'a animationDelay dans son style', () => {
+    render(<EmojiPicker onSelect={vi.fn()} />)
+    const buttons = screen.getAllByRole('button')
+    buttons.forEach((btn) => {
+      expect(btn).not.toHaveStyle({ animationDelay: '0ms' })
+      expect(btn.className).not.toContain('emoji-appear')
+    })
+  })
 })
