@@ -43,7 +43,7 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # Epic 1 : Fondation technique & Spike MediaPipe
-  epic-1: in-progress
+  epic-1: done
   1-1-initialisation-du-projet-et-pipeline-cicd: done
   1-2-architecture-routing-guards-structure-dossiers: done
   1-3-schema-indexeddb-dexie-stores-zustand-initiaux: done
@@ -52,11 +52,11 @@ development_status:
 
   # Epic 2 : Onboarding parent & passage de main
   epic-2: in-progress
-  2-1-ecran-accueil-onboarding-creation-profil-parent: review
-  2-2-demande-gestion-permission-camera: review
-  2-3-installation-pwa-guidee: in-progress
-  2-4-passage-de-main-selection-emoji: review
-  2-5-flux-recuperation-indexeddb-vide: review
+  2-1-ecran-accueil-onboarding-creation-profil-parent: done
+  2-2-demande-gestion-permission-camera: done
+  2-3-installation-pwa-guidee: done
+  2-4-passage-de-main-selection-emoji: done
+  2-5-flux-recuperation-indexeddb-vide: done
   2-6-ecran-bascule-parent-enfant-animation: review
   epic-2-retrospective: optional
 
