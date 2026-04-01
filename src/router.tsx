@@ -34,6 +34,11 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
   routeTree,
   basepath: '/BrossQuest',   // ⚠️ même valeur que vite.config.ts `base`
+  defaultPendingComponent: () => (
+    <div className="flex min-h-[100dvh] items-center justify-center bg-bg-session px-4 text-white/70">
+      Chargement…
+    </div>
+  ),
 })
 
 // Enregistrement TypeScript global — nécessaire pour les hooks typés

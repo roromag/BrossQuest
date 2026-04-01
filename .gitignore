@@ -42,3 +42,9 @@ build/
 # =============================================
 public/mediapipe/hand_landmarker.task
 public/mediapipe/wasm/
+
+
+# =============================================
+# Cursor (trop lourds pour git)
+# =============================================
+.cursor/
