@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-26
-last_updated: 2026-03-31  # Story 2.6 review
+last_updated: 2026-04-01  # Story 2.6 done — Epic 2 complet
 project: BrossQuest
 project_key: NOKEY
 tracking_system: file-system
@@ -51,13 +51,13 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2 : Onboarding parent & passage de main
-  epic-2: in-progress
+  epic-2: done
   2-1-ecran-accueil-onboarding-creation-profil-parent: done
   2-2-demande-gestion-permission-camera: done
   2-3-installation-pwa-guidee: done
   2-4-passage-de-main-selection-emoji: done
   2-5-flux-recuperation-indexeddb-vide: done
-  2-6-ecran-bascule-parent-enfant-animation: review
+  2-6-ecran-bascule-parent-enfant-animation: done
   epic-2-retrospective: optional
 
   # Epic 3 : Session technique complète — moteur détection, nébuleuse & pipeline Avant/Pendant/Après

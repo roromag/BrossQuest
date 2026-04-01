@@ -35,9 +35,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
   }
 })
 
-import { HandoffPage } from '../routes/handoff.route'
+import { HandoffPageContent, handoffRoute } from '../routes/handoff.route'
 
-describe('HandoffPage', () => {
+describe('HandoffPageContent', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetActiveProfile.mockResolvedValue(mockProfile)
@@ -46,21 +46,19 @@ describe('HandoffPage', () => {
 
   // ── Écran de bascule ──────────────────────────────────────────────────────
 
-  it('affiche le texte "Quel emoji pour accueillir" avec le prénom du profil', async () => {
-    render(<HandoffPage />)
-    expect(await screen.findByText(/Quel emoji pour accueillir Lucas/)).toBeInTheDocument()
+  it('affiche le texte "Quel emoji pour accueillir" avec le prénom du profil', () => {
+    render(<HandoffPageContent profile={mockProfile} />)
+    expect(screen.getByText(/Quel emoji pour accueillir Lucas/)).toBeInTheDocument()
   })
 
-  it('EmojiPicker n\'est PAS rendu avant le clic sur le bouton', async () => {
-    render(<HandoffPage />)
-    // Attendre que le profil soit chargé (le bouton bascule apparaît)
-    await screen.findByRole('button', { name: /Choisir mon emoji/i })
-    // La grille d'emojis ne doit pas encore être présente
+  it('EmojiPicker n\'est PAS rendu avant le clic sur le bouton', () => {
+    render(<HandoffPageContent profile={mockProfile} />)
+    expect(screen.getByRole('button', { name: /Choisir mon emoji/i })).toBeInTheDocument()
     expect(screen.queryByLabelText('Choisis ton emoji')).toBeNull()
   })
 
   it('clic sur "Choisir mon emoji" → EmojiPicker est rendu (8 boutons emoji)', async () => {
-    render(<HandoffPage />)
+    render(<HandoffPageContent profile={mockProfile} />)
     const basculeBtn = await screen.findByRole('button', { name: /Choisir mon emoji/i })
     await userEvent.click(basculeBtn)
     const emojiButtons = screen.getAllByRole('button')
@@ -70,7 +68,7 @@ describe('HandoffPage', () => {
   // ── Comportement Story 2.4 conservé ──────────────────────────────────────
 
   it('sélection emoji → saveProfile appelé avec emoji + onboardingComplete: true', async () => {
-    render(<HandoffPage />)
+    render(<HandoffPageContent profile={mockProfile} />)
     await userEvent.click(await screen.findByRole('button', { name: /Choisir mon emoji/i }))
     await userEvent.click(screen.getByRole('button', { name: '🦁' }))
     await waitFor(() => expect(mockSaveProfile).toHaveBeenCalledOnce())
@@ -80,14 +78,14 @@ describe('HandoffPage', () => {
   })
 
   it('après sélection → navigation vers /home', async () => {
-    render(<HandoffPage />)
+    render(<HandoffPageContent profile={mockProfile} />)
     await userEvent.click(await screen.findByRole('button', { name: /Choisir mon emoji/i }))
     await userEvent.click(screen.getByRole('button', { name: '🐻' }))
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith({ to: '/home' }))
   })
 
   it('après sélection → useProfileStore mis à jour avec le profil final', async () => {
-    render(<HandoffPage />)
+    render(<HandoffPageContent profile={mockProfile} />)
     await userEvent.click(await screen.findByRole('button', { name: /Choisir mon emoji/i }))
     await userEvent.click(screen.getByRole('button', { name: '🐼' }))
     await waitFor(() => expect(mockSetProfile).toHaveBeenCalledOnce())
@@ -96,21 +94,50 @@ describe('HandoffPage', () => {
     )
   })
 
-  it('getActiveProfile retourne undefined → aucun bouton rendu (null)', async () => {
-    mockGetActiveProfile.mockResolvedValue(undefined)
-    const { container } = render(<HandoffPage />)
-    await waitFor(() => expect(mockGetActiveProfile).toHaveBeenCalled())
-    expect(screen.queryAllByRole('button')).toHaveLength(0)
-    expect(container.firstChild).toBeNull()
-  })
-
   it('saveProfile rejette → navigate non appelé et store non mis à jour', async () => {
     mockSaveProfile.mockRejectedValue(new Error('DB error'))
-    render(<HandoffPage />)
+    render(<HandoffPageContent profile={mockProfile} />)
     await userEvent.click(await screen.findByRole('button', { name: /Choisir mon emoji/i }))
     await userEvent.click(screen.getByRole('button', { name: '🦊' }))
     await waitFor(() => expect(mockSaveProfile).toHaveBeenCalledOnce())
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockSetProfile).not.toHaveBeenCalled()
+  })
+})
+
+describe('handoffRoute.loader', () => {
+  const loader = (handoffRoute as unknown as { options: { loader: () => Promise<unknown> } }).options.loader
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetActiveProfile.mockResolvedValue(mockProfile)
+    mockSaveProfile.mockResolvedValue(undefined)
+  })
+
+  it('retourne le profil si onboarding incomplet', async () => {
+    await expect(loader()).resolves.toEqual({ profile: mockProfile })
+    expect(mockGetActiveProfile).toHaveBeenCalledOnce()
+  })
+
+  it('redirige vers /onboarding si aucun profil', async () => {
+    mockGetActiveProfile.mockResolvedValue(undefined)
+    let thrown: unknown
+    try {
+      await loader()
+    } catch (e) {
+      thrown = e
+    }
+    expect((thrown as { options: { to: string } }).options.to).toBe('/onboarding')
+  })
+
+  it('redirige vers /home si onboarding déjà complété', async () => {
+    mockGetActiveProfile.mockResolvedValue({ ...mockProfile, onboardingComplete: true })
+    let thrown: unknown
+    try {
+      await loader()
+    } catch (e) {
+      thrown = e
+    }
+    expect((thrown as { options: { to: string } }).options.to).toBe('/home')
   })
 })
