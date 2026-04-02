@@ -8,6 +8,7 @@ describe('useCameraStore', () => {
       detectionQuality: 'absent',
       detectionState: 'absent',
       isMediaPipeLoading: false,
+      sessionStream: null,
     })
   })
 
@@ -17,6 +18,7 @@ describe('useCameraStore', () => {
     expect(s.detectionQuality).toBe('absent')
     expect(s.detectionState).toBe('absent')
     expect(s.isMediaPipeLoading).toBe(false)
+    expect(s.sessionStream).toBeNull()
   })
 
   it('setPermissionState met à jour permissionState', () => {
@@ -37,5 +39,19 @@ describe('useCameraStore', () => {
   it('setMediaPipeLoading met à jour isMediaPipeLoading', () => {
     useCameraStore.getState().setMediaPipeLoading(true)
     expect(useCameraStore.getState().isMediaPipeLoading).toBe(true)
+  })
+
+  it('setSessionStream met à jour le flux de session', () => {
+    const fakeStream = { id: 'stream-1' } as unknown as MediaStream
+    useCameraStore.getState().setSessionStream(fakeStream)
+    expect(useCameraStore.getState().sessionStream).toBe(fakeStream)
+  })
+
+  it('resetSessionRuntime nettoie le runtime de session', () => {
+    const fakeStream = { id: 'stream-2' } as unknown as MediaStream
+    useCameraStore.setState({ isMediaPipeLoading: true, sessionStream: fakeStream })
+    useCameraStore.getState().resetSessionRuntime()
+    expect(useCameraStore.getState().isMediaPipeLoading).toBe(false)
+    expect(useCameraStore.getState().sessionStream).toBeNull()
   })
 })

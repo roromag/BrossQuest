@@ -3,7 +3,7 @@
 **Epic :** 3 - Session technique complete - moteur detection, nebuleuse & pipeline Avant/Pendant/Apres
 **Story ID :** 3.2
 **Story Key :** `3-2-lancement-session-integration-camera-getusermedia-ios`
-**Status :** ready-for-dev
+**Status :** done
 **Date :** 2026-04-02
 
 ---
@@ -65,42 +65,51 @@ Objectif principal: fiabiliser le "one tap to session start" en conditions mobil
 
 ## Tasks / Subtasks
 
-- [ ] T1 - Implementer le demarrage session sur tap depuis `/home`
-  - [ ] Connecter `PulseButton` a un handler de lancement explicite (pas seulement rendu visuel)
-  - [ ] Appeler `getUserMedia` immediatement dans ce handler (sans async prealable)
-  - [ ] Naviguer vers `/session` uniquement apres initialisation camera validee
+- [x] T1 - Implementer le demarrage session sur tap depuis `/home`
+  - [x] Connecter `PulseButton` a un handler de lancement explicite (pas seulement rendu visuel)
+  - [x] Appeler `getUserMedia` immediatement dans ce handler (sans async prealable)
+  - [x] Naviguer vers `/session` uniquement apres initialisation camera validee
 
-- [ ] T2 - Introduire une couche camera reutilisable et testable
-  - [ ] Centraliser start/stop stream dans `src/lib/camera/` (ou dossier equivalent coherent architecture)
-  - [ ] Eviter le code camera inline dans les composants
-  - [ ] Definir des types explicites pour succes/echec d'initialisation camera
+- [x] T2 - Introduire une couche camera reutilisable et testable
+  - [x] Centraliser start/stop stream dans `src/lib/camera/` (ou dossier equivalent coherent architecture)
+  - [x] Eviter le code camera inline dans les composants
+  - [x] Definir des types explicites pour succes/echec d'initialisation camera
 
-- [ ] T3 - Mettre a jour `useCameraStore` pour l'etat runtime session
-  - [ ] Setter coherents pour `permissionState`, `isMediaPipeLoading` et etat stream
-  - [ ] Garder des selecteurs fins dans les composants (pas de `useCameraStore()` global)
-  - [ ] Garantir un reset propre en cas d'echec
+- [x] T3 - Mettre a jour `useCameraStore` pour l'etat runtime session
+  - [x] Setter coherents pour `permissionState`, `isMediaPipeLoading` et etat stream
+  - [x] Garder des selecteurs fins dans les composants (pas de `useCameraStore()` global)
+  - [x] Garantir un reset propre en cas d'echec
 
-- [ ] T4 - Preparer route `/session` pour affichage flux video
-  - [ ] Remplacer le placeholder Story 3.2 par une base minimale de session camera-ready
-  - [ ] Rendre un `<video playsinline autoplay muted>` alimente par le stream courant
-  - [ ] Laisser CameraFade/narration hors scope (Story 3.3)
+- [x] T4 - Preparer route `/session` pour affichage flux video
+  - [x] Remplacer le placeholder Story 3.2 par une base minimale de session camera-ready
+  - [x] Rendre un `<video playsinline autoplay muted>` alimente par le stream courant
+  - [x] Laisser CameraFade/narration hors scope (Story 3.3)
 
-- [ ] T5 - Gestions d'erreurs et redirections
-  - [ ] Mapper `NotAllowedError`/permission refusee vers `/recovery/camera`
-  - [ ] Logger cote dev sans exposer message brut cote enfant
-  - [ ] Verifier que `CameraGuard` et le flux de lancement ne se contredisent pas
+- [x] T5 - Gestions d'erreurs et redirections
+  - [x] Mapper `NotAllowedError`/permission refusee vers `/recovery/camera`
+  - [x] Logger cote dev sans exposer message brut cote enfant
+  - [x] Verifier que `CameraGuard` et le flux de lancement ne se contredisent pas
 
-- [ ] T6 - AudioContext lifecycle iOS
-  - [ ] Initialiser ou `resume()` AudioContext dans le tap handler
-  - [ ] Ajouter gestion `visibilitychange` pour reprise au retour foreground
-  - [ ] Encapsuler cette logique dans `src/lib/audio/` ou `src/lib/speech/` (pas dans la route)
+- [x] T6 - AudioContext lifecycle iOS
+  - [x] Initialiser ou `resume()` AudioContext dans le tap handler
+  - [x] Ajouter gestion `visibilitychange` pour reprise au retour foreground
+  - [x] Encapsuler cette logique dans `src/lib/audio/` ou `src/lib/speech/` (pas dans la route)
 
-- [ ] T7 - Tests et verification
-  - [ ] Tests unitaires handler tap: appel immediat `getUserMedia`, navigation, mise a jour store
-  - [ ] Tests echec camera: redirection `/recovery/camera`, pas d'UI erreur enfant
-  - [ ] Test rendu session: presence `<video playsinline autoplay muted>`
-  - [ ] `npm test` vert
-  - [ ] `npm run build` sans nouvelle erreur introduite
+- [x] T7 - Tests et verification
+  - [x] Tests unitaires handler tap: appel immediat `getUserMedia`, navigation, mise a jour store
+  - [x] Tests echec camera: redirection `/recovery/camera`, pas d'UI erreur enfant
+  - [x] Test rendu session: presence `<video playsinline autoplay muted>`
+  - [x] `npm test` vert
+  - [x] `npm run build` sans nouvelle erreur introduite
+
+---
+
+### Review Findings
+
+- [x] [Review][Patch] Double lancement caméra possible si double tap avant re-render (closure `isMediaPipeLoading` périmée) [`src/routes/home.route.tsx`] — corrigé : garde via `useCameraStore.getState().isMediaPipeLoading` + tests HomePage
+- [x] [Review][Patch] Tests `launchSessionFromHomeTap` incomplets : branche `.catch` et résultats `ok: false` avec `reason` autre que `permission-denied` [`src/routes/home.launch-session.test.ts`] — corrigé : scénarios `unavailable`, `unknown`, rejet promesse
+- [x] [Review][Defer] Aucun arrêt explicite des tracks (`stopSessionCamera`) à la sortie de `/session` — deferred, hors périmètre story 3.2
+- [x] [Review][Defer] Ajustement Workbox / `PWA_WORKBOX_NO_TERSER` dans `vite.config.ts` — deferred, contournement build/tooling (T7), pas exigence fonctionnelle 3.2
 
 ---
 
@@ -219,18 +228,37 @@ gpt-5.3-codex-low
 - Inspection code existant (`home.route.tsx`, `session.route.tsx`, `useCameraStore.ts`)
 - Verification historique git recent (5 commits)
 - Veille technique rapide WebKit/MDN (user activation camera/audio iOS)
+- Implementation T1-T6: ajout des couches `src/lib/camera/` et `src/lib/audio/`, orchestration de lancement dans `home.launch-session.ts`
+- Validation finale: `npm test` OK (133 tests), `npm run build` OK en environnement standard
+- Contournement documente: `PWA_WORKBOX_NO_TERSER=1` pour environnements restreints (sandbox / CI sans workers Terser sur le bundle workbox)
 
 ### Completion Notes List
 
-- Story 3.2 contextualisee avec contraintes iOS strictes (camera + audio)
-- Taches orientees implementation incremental sans deborder sur Story 3.3
-- Guardrails anti-regressions enfant/parent explicites
-- References de code et architecture reliees au contexte reel du repo
+- Implementation "one tap to session start" branchee depuis `/home` avec appel camera dans le handler utilisateur et navigation conditionnelle.
+- Store camera et route `/session` prepares pour un flux video inline (`autoplay`, `muted`, `playsInline`) sans logique Story 3.3.
+- Gestion des erreurs centralisee: mapping permission refusee vers `/recovery/camera` + log dev uniquement.
+- Runtime audio iOS encapsule dans `src/lib/audio/sessionAudio.ts` avec reprise au `visibilitychange`.
+- T7 valide: tests + build verifies; option `PWA_WORKBOX_NO_TERSER=1` dans `vite.config.ts` pour builds dans environnements ou Terser/workers echouent.
 
 ### File List
 
-- `_bmad-output/implementation-artifacts/3-2-lancement-session-integration-camera-getusermedia-ios.md` (nouveau)
+- `_bmad-output/implementation-artifacts/3-2-lancement-session-integration-camera-getusermedia-ios.md` (mise a jour suivi implementation)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (story 3.2 -> review)
+- `vite.config.ts` (option `PWA_WORKBOX_NO_TERSER` pour workbox sans minification Terser si besoin)
+- `src/routes/home.route.tsx` (handler de lancement session branche sur `PulseButton`)
+- `src/routes/home.route.test.tsx` (ajustement mock store camera)
+- `src/routes/home.launch-session.ts` (nouveau orchestrateur lancement session)
+- `src/routes/home.launch-session.test.ts` (tests unitaires du handler tap)
+- `src/routes/session.route.tsx` (route session camera-ready avec video inline)
+- `src/routes/session.route.test.tsx` (tests rendu video + redirection sans stream)
+- `src/stores/useCameraStore.ts` (etat runtime stream + reset)
+- `src/stores/useCameraStore.test.ts` (tests nouveaux setters/reset)
+- `src/lib/camera/sessionCamera.ts` (wrapper start/stop camera + types resultat)
+- `src/lib/camera/sessionCamera.test.ts` (tests camera start/stop)
+- `src/lib/audio/sessionAudio.ts` (initialisation/resume AudioContext iOS)
 
 ## Change Log
 
 - 2026-04-02: Creation story 3.2 ready-for-dev (contexte complet implementation + guardrails)
+- 2026-04-02: Implementation partielle T1-T6 + T7 tests OK; story maintenue in-progress (build PWA KO sur Workbox/Terser)
+- 2026-04-02: T7 complete (build OK + option `PWA_WORKBOX_NO_TERSER`), story passee en statut review

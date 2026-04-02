@@ -4,6 +4,11 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 
+function nodeEnv(name: string): string | undefined {
+  const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+  return proc?.env?.[name]
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   base: '/BrossQuest/',
@@ -18,6 +23,10 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
         maximumFileSizeToCacheInBytes: 30 * 1024 * 1024, // 30 Mo budget (NFR-P5)
+        // workbox-build minifie le SW avec @rollup/plugin-terser (workers async). Dans certains
+        // environnements restreints (sandbox, CI sans workers), ça peut provoquer "Unexpected early exit".
+        // `PWA_WORKBOX_NO_TERSER=1` désactive cette minification (SW un peu plus gros).
+        ...(nodeEnv('PWA_WORKBOX_NO_TERSER') === '1' ? { mode: 'development' as const } : {}),
       },
       manifest: {
         name: 'BrossQuest',

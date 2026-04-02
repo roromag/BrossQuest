@@ -8,10 +8,13 @@ interface CameraStore {
   detectionQuality: DetectionQuality
   detectionState: DetectionState
   isMediaPipeLoading: boolean
+  sessionStream: MediaStream | null
   setPermissionState: (state: PermissionState) => void
   setDetectionQuality: (quality: DetectionQuality) => void
   setDetectionState: (state: DetectionState) => void
   setMediaPipeLoading: (loading: boolean) => void
+  setSessionStream: (stream: MediaStream | null) => void
+  resetSessionRuntime: () => void
 }
 
 export const useCameraStore = create<CameraStore>()((set) => ({
@@ -19,8 +22,15 @@ export const useCameraStore = create<CameraStore>()((set) => ({
   detectionQuality: 'absent',
   detectionState: 'absent',
   isMediaPipeLoading: false,
+  sessionStream: null,
   setPermissionState: (permissionState) => set({ permissionState }),
   setDetectionQuality: (detectionQuality) => set({ detectionQuality }),
   setDetectionState: (detectionState) => set({ detectionState }),
   setMediaPipeLoading: (isMediaPipeLoading) => set({ isMediaPipeLoading }),
+  setSessionStream: (sessionStream) => set({ sessionStream }),
+  resetSessionRuntime: () =>
+    set({
+      isMediaPipeLoading: false,
+      sessionStream: null,
+    }),
 }))

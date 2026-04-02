@@ -1,4 +1,4 @@
-import { createRoute, redirect } from '@tanstack/react-router'
+import { createRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { checkProfileStatus } from '../guards/ProfileGuard'
 import { checkCameraPermission } from '../guards/CameraGuard'
@@ -8,6 +8,7 @@ import { ParentAccessIcon } from '../components/parent/ParentAccessIcon'
 import { PulseButton } from '../components/session/PulseButton'
 import { useCameraStore } from '../stores/useCameraStore'
 import { useEpisodeStore } from '../stores/useEpisodeStore'
+import { launchSessionFromHomeTap } from './home.launch-session'
 
 interface HomePageProps {
   loaderData?: { isRestMode: boolean; period: 'morning' | 'evening' }
@@ -24,12 +25,28 @@ function HomePending() {
 export function HomePage({ loaderData }: HomePageProps = {}) {
   const resolvedLoaderData = loaderData ?? homeRoute.useLoaderData() ?? { isRestMode: false, period: 'morning' as const }
   const { isRestMode, period } = resolvedLoaderData
+  const navigate = useNavigate()
   const isMediaPipeLoading = useCameraStore((s) => s.isMediaPipeLoading)
   const detectionState = useCameraStore((s) => s.detectionState)
+  const setPermissionState = useCameraStore((s) => s.setPermissionState)
+  const setMediaPipeLoading = useCameraStore((s) => s.setMediaPipeLoading)
+  const setSessionStream = useCameraStore((s) => s.setSessionStream)
   const currentEpisodeId = useEpisodeStore((s) => s.currentEpisode?.id)
 
   const pulseState = detectionState === 'absent' ? 'idle' : 'presence-detected'
   const episodeTitle = currentEpisodeId ? `Épisode ${currentEpisodeId}` : 'Épisode du jour'
+  const handleLaunchSession = () => {
+    if (useCameraStore.getState().isMediaPipeLoading) return
+    launchSessionFromHomeTap({
+      setPermissionState,
+      setMediaPipeLoading,
+      setSessionStream,
+      navigateTo: (path) => navigate({ to: path }),
+      onError: (error) => {
+        console.error('[home] camera launch failed', error)
+      },
+    })
+  }
 
   if (isRestMode) {
     const msg = period === 'morning' ? 'À ce soir ✨' : 'À demain ✨'
@@ -43,7 +60,7 @@ export function HomePage({ loaderData }: HomePageProps = {}) {
   return (
     <main className="h-[100dvh] w-screen bg-bg-session [padding:env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]">
       <NarrativeCard episodeTitle={episodeTitle}>
-        <PulseButton state={pulseState} disabled={isMediaPipeLoading} />
+        <PulseButton state={pulseState} disabled={isMediaPipeLoading} onClick={handleLaunchSession} />
         <ParentAccessIcon />
       </NarrativeCard>
     </main>
