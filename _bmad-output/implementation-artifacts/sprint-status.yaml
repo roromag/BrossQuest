@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-26
-last_updated: 2026-04-01  # Story 3.1 moved to review
+last_updated: 2026-04-02  # Story 3.2 moved to ready-for-dev
 project: BrossQuest
 project_key: NOKEY
 tracking_system: file-system
@@ -62,8 +62,8 @@ development_status:
 
   # Epic 3 : Session technique complète — moteur détection, nébuleuse & pipeline Avant/Pendant/Après
   epic-3: in-progress
-  3-1-ecran-accueil-atmospherique-pulsebutton: review
-  3-2-lancement-session-integration-camera-getusermedia-ios: backlog
+  3-1-ecran-accueil-atmospherique-pulsebutton: done
+  3-2-lancement-session-integration-camera-getusermedia-ios: ready-for-dev
   3-3-phase-avant-camerafade-narration-placeholder: backlog
   3-4-nebulacanvas-animation-nebuleuse-8-zones: backlog
   3-5-detection-mediapipe-progression-cumulative: backlog
