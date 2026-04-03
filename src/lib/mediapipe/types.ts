@@ -1,7 +1,7 @@
 // src/lib/mediapipe/types.ts
 
-/** 3 états de détection du mouvement de brossage */
-export type DetectionState = 'brushing-active' | 'pause' | 'absent'
+/** Machine à états détection (architecture produit — epic 3) */
+export type DetectionState = 'BRUSHING' | 'DEBOUNCING' | 'PAUSED' | 'HAND_LOST'
 
 /** Qualité de la détection caméra/landmarks */
 export type DetectionQuality = 'good' | 'degraded' | 'absent'

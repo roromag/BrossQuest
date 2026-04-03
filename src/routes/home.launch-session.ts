@@ -7,6 +7,8 @@ interface LaunchSessionDeps {
   setMediaPipeLoading: (value: boolean) => void
   setSessionStream: (stream: MediaStream | null) => void
   navigateTo: (path: '/session' | '/recovery/camera') => void
+  /** Appelé après attribution du flux, avant navigation — ex. phase session `before` pour une entrée neuve depuis /home. */
+  onSessionCameraReady?: () => void
   startCamera?: () => Promise<CameraStartResult>
   onError?: (error: unknown) => void
 }
@@ -22,6 +24,7 @@ export function launchSessionFromHomeTap(deps: LaunchSessionDeps): void {
       if (result.ok) {
         deps.setSessionStream(result.stream)
         deps.setPermissionState('granted')
+        deps.onSessionCameraReady?.()
         deps.navigateTo('/session')
         return
       }

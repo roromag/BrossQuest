@@ -123,7 +123,7 @@ function processResults(
   if (!landmarks || landmarks.length === 0) {
     clearBuffers()
     return {
-      state: 'absent',
+      state: 'HAND_LOST',
       quality: 'absent',
       velocity: null,
       handConfidence: null,
@@ -189,7 +189,8 @@ function computeVelocity(x: number, y: number, ts: number): VelocityData {
 function classifyState(velocity: VelocityData): DetectionState {
   const isMoving = velocity.smoothed > config.detectionThreshold
   const isOscillating = velocity.directionReversals >= config.oscillationMinReversals
-  return isMoving && isOscillating ? 'brushing-active' : 'pause'
+  // DEBOUNCING : immobilité avec main visible — timer 3s → PAUSED en Story 3.5
+  return isMoving && isOscillating ? 'BRUSHING' : 'DEBOUNCING'
 }
 
 function clearBuffers(): void {

@@ -11,7 +11,7 @@ const mockUseEpisodeStore = vi.fn()
 vi.mock('../stores/useCameraStore', () => ({
   useCameraStore: Object.assign(
     (selector: (s: {
-      detectionState: 'absent' | 'pause' | 'brushing-active'
+      detectionState: 'HAND_LOST' | 'DEBOUNCING' | 'BRUSHING' | 'PAUSED'
       isMediaPipeLoading: boolean
       setPermissionState: (state: 'granted' | 'denied' | 'prompt') => void
       setMediaPipeLoading: (loading: boolean) => void
@@ -37,7 +37,7 @@ describe('HomePage', () => {
     mockLaunchSessionFromHomeTap.mockReset()
     cameraGetState.mockImplementation(() => mockUseCameraStore())
     mockUseCameraStore.mockReturnValue({
-      detectionState: 'absent',
+      detectionState: 'HAND_LOST',
       isMediaPipeLoading: false,
       setPermissionState: vi.fn(),
       setMediaPipeLoading: vi.fn(),
@@ -55,7 +55,7 @@ describe('HomePage', () => {
 
   it('passe en etat presence-detected quand une presence est detectee', () => {
     mockUseCameraStore.mockReturnValue({
-      detectionState: 'pause',
+      detectionState: 'DEBOUNCING',
       isMediaPipeLoading: false,
       setPermissionState: vi.fn(),
       setMediaPipeLoading: vi.fn(),
@@ -68,7 +68,7 @@ describe('HomePage', () => {
 
   it('desactive le PulseButton pendant le chargement MediaPipe sans spinner', () => {
     mockUseCameraStore.mockReturnValue({
-      detectionState: 'absent',
+      detectionState: 'HAND_LOST',
       isMediaPipeLoading: true,
       setPermissionState: vi.fn(),
       setMediaPipeLoading: vi.fn(),
@@ -91,7 +91,7 @@ describe('HomePage', () => {
 
   it('appelle launchSessionFromHomeTap au tap quand le chargement est inactif', () => {
     mockUseCameraStore.mockReturnValue({
-      detectionState: 'pause',
+      detectionState: 'DEBOUNCING',
       isMediaPipeLoading: false,
       setPermissionState: vi.fn(),
       setMediaPipeLoading: vi.fn(),
@@ -104,7 +104,7 @@ describe('HomePage', () => {
 
   it('ne relance pas si getState indique chargement actif (evite double tap avant re-render)', () => {
     const snapshot = {
-      detectionState: 'pause' as const,
+      detectionState: 'DEBOUNCING' as const,
       isMediaPipeLoading: false,
       setPermissionState: vi.fn(),
       setMediaPipeLoading: vi.fn(),

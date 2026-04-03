@@ -13,6 +13,7 @@ describe('launchSessionFromHomeTap', () => {
       setPermissionState: vi.fn(() => calls.push('setPermissionState')),
       setMediaPipeLoading: vi.fn(() => calls.push('setMediaPipeLoading')),
       setSessionStream: vi.fn(() => calls.push('setSessionStream')),
+      onSessionCameraReady: vi.fn(() => calls.push('onSessionCameraReady')),
       navigateTo: vi.fn(() => calls.push('navigateTo')),
       startCamera,
       onError: vi.fn(),
@@ -28,7 +29,14 @@ describe('launchSessionFromHomeTap', () => {
 
     expect(deps.setSessionStream).toHaveBeenCalledWith(fakeStream)
     expect(deps.setPermissionState).toHaveBeenCalledWith('granted')
+    expect(deps.onSessionCameraReady).toHaveBeenCalledTimes(1)
     expect(deps.navigateTo).toHaveBeenCalledWith('/session')
+    expect(calls).toContain('onSessionCameraReady')
+    const idxStream = calls.indexOf('setSessionStream')
+    const idxReady = calls.indexOf('onSessionCameraReady')
+    const idxNav = calls.indexOf('navigateTo')
+    expect(idxStream).toBeLessThan(idxReady)
+    expect(idxReady).toBeLessThan(idxNav)
   })
 
   it('redirige vers /recovery/camera en cas de refus permission', async () => {

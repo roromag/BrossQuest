@@ -231,6 +231,7 @@ gpt-5.3-codex-low
 - Implementation T1-T6: ajout des couches `src/lib/camera/` et `src/lib/audio/`, orchestration de lancement dans `home.launch-session.ts`
 - Validation finale: `npm test` OK (133 tests), `npm run build` OK en environnement standard
 - Contournement documente: `PWA_WORKBOX_NO_TERSER=1` pour environnements restreints (sandbox / CI sans workers Terser sur le bundle workbox)
+- 2026-04-02 (re-verif dev-story 3.2): `npm test` OK (138 tests), `npm run build` OK avec `PWA_WORKBOX_NO_TERSER=1` (echec Terser/workbox sans cette variable dans l’environnement de build courant)
 
 ### Completion Notes List
 
@@ -262,3 +263,4 @@ gpt-5.3-codex-low
 - 2026-04-02: Creation story 3.2 ready-for-dev (contexte complet implementation + guardrails)
 - 2026-04-02: Implementation partielle T1-T6 + T7 tests OK; story maintenue in-progress (build PWA KO sur Workbox/Terser)
 - 2026-04-02: T7 complete (build OK + option `PWA_WORKBOX_NO_TERSER`), story passee en statut review
+- 2026-04-02: Re-passage workflow dev-story 3.2 — verification tests/build (note Debug Log)

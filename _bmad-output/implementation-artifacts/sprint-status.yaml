@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-26
-last_updated: 2026-04-02  # Story 3.2 review patches applied, statut done
+last_updated: 2026-04-02
 project: BrossQuest
 project_key: NOKEY
 tracking_system: file-system
@@ -64,8 +64,8 @@ development_status:
   epic-3: in-progress
   3-1-ecran-accueil-atmospherique-pulsebutton: done
   3-2-lancement-session-integration-camera-getusermedia-ios: done
-  3-3-phase-avant-camerafade-narration-placeholder: backlog
-  3-4-nebulacanvas-animation-nebuleuse-8-zones: backlog
+  3-3-phase-avant-camerafade-narration-placeholder: review
+  3-4-nebulacanvas-animation-nebuleuse-8-zones: review
   3-5-detection-mediapipe-progression-cumulative: backlog
   3-6-micro-evenements-reactifs-inattention: backlog
   3-7-phase-apres-micro-celebration: backlog

@@ -6,7 +6,8 @@ describe('useCameraStore', () => {
     useCameraStore.setState({
       permissionState: 'prompt',
       detectionQuality: 'absent',
-      detectionState: 'absent',
+      detectionState: 'HAND_LOST',
+      brushVelocitySmoothed: 0,
       isMediaPipeLoading: false,
       sessionStream: null,
     })
@@ -16,7 +17,8 @@ describe('useCameraStore', () => {
     const s = useCameraStore.getState()
     expect(s.permissionState).toBe('prompt')
     expect(s.detectionQuality).toBe('absent')
-    expect(s.detectionState).toBe('absent')
+    expect(s.detectionState).toBe('HAND_LOST')
+    expect(s.brushVelocitySmoothed).toBe(0)
     expect(s.isMediaPipeLoading).toBe(false)
     expect(s.sessionStream).toBeNull()
   })
@@ -32,8 +34,13 @@ describe('useCameraStore', () => {
   })
 
   it('setDetectionState met à jour detectionState', () => {
-    useCameraStore.getState().setDetectionState('brushing-active')
-    expect(useCameraStore.getState().detectionState).toBe('brushing-active')
+    useCameraStore.getState().setDetectionState('BRUSHING')
+    expect(useCameraStore.getState().detectionState).toBe('BRUSHING')
+  })
+
+  it('setBrushVelocitySmoothed met à jour la vélocité lissée', () => {
+    useCameraStore.getState().setBrushVelocitySmoothed(0.04)
+    expect(useCameraStore.getState().brushVelocitySmoothed).toBe(0.04)
   })
 
   it('setMediaPipeLoading met à jour isMediaPipeLoading', () => {

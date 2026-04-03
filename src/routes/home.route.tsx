@@ -8,6 +8,7 @@ import { ParentAccessIcon } from '../components/parent/ParentAccessIcon'
 import { PulseButton } from '../components/session/PulseButton'
 import { useCameraStore } from '../stores/useCameraStore'
 import { useEpisodeStore } from '../stores/useEpisodeStore'
+import { useSessionStore } from '../stores/useSessionStore'
 import { launchSessionFromHomeTap } from './home.launch-session'
 
 interface HomePageProps {
@@ -33,7 +34,7 @@ export function HomePage({ loaderData }: HomePageProps = {}) {
   const setSessionStream = useCameraStore((s) => s.setSessionStream)
   const currentEpisodeId = useEpisodeStore((s) => s.currentEpisode?.id)
 
-  const pulseState = detectionState === 'absent' ? 'idle' : 'presence-detected'
+  const pulseState = detectionState === 'HAND_LOST' ? 'idle' : 'presence-detected'
   const episodeTitle = currentEpisodeId ? `Épisode ${currentEpisodeId}` : 'Épisode du jour'
   const handleLaunchSession = () => {
     if (useCameraStore.getState().isMediaPipeLoading) return
@@ -41,6 +42,9 @@ export function HomePage({ loaderData }: HomePageProps = {}) {
       setPermissionState,
       setMediaPipeLoading,
       setSessionStream,
+      onSessionCameraReady: () => {
+        useSessionStore.getState().setPhase('before')
+      },
       navigateTo: (path) => navigate({ to: path }),
       onError: (error) => {
         console.error('[home] camera launch failed', error)

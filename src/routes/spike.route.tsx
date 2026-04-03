@@ -156,7 +156,14 @@ function SpikeDetectionPage() {
         <div style={{ marginTop: '1rem', background: '#2D3748', padding: '1rem', borderRadius: '8px' }}>
           <div style={{
             fontSize: '1.5rem',
-            color: lastResult.state === 'brushing-active' ? '#48BB78' : lastResult.state === 'pause' ? '#F6AD55' : '#FC8181'
+            color:
+              lastResult.state === 'BRUSHING'
+                ? '#48BB78'
+                : lastResult.state === 'DEBOUNCING'
+                  ? '#F6AD55'
+                  : lastResult.state === 'PAUSED'
+                    ? '#ED8936'
+                    : '#FC8181'
           }}>
             État : <strong>{lastResult.state}</strong>
           </div>

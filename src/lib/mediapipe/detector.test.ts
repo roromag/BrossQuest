@@ -24,8 +24,8 @@ describe('classification de détection', () => {
 
 describe('DetectionState', () => {
   it('les valeurs attendues sont correctement typées', () => {
-    const states: DetectionState[] = ['brushing-active', 'pause', 'absent']
-    expect(states).toHaveLength(3)
+    const states: DetectionState[] = ['BRUSHING', 'DEBOUNCING', 'PAUSED', 'HAND_LOST']
+    expect(states).toHaveLength(4)
   })
 })
 
