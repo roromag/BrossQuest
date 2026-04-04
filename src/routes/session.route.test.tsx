@@ -1,6 +1,7 @@
 import { render, screen, act } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { DetectionState } from '../lib/mediapipe/types'
+import { ZONE_COUNT, ZONE_DURATION_MS } from '../lib/session/zones'
 import { SessionPage } from './session.route'
 
 const mockNavigate = vi.fn()
@@ -11,6 +12,10 @@ const sessionFixture = vi.hoisted(() => ({
   activeZone: 1,
   setPhase: vi.fn((p: 'before' | 'during' | 'after') => {
     sessionFixture.phase = p
+  }),
+  advanceZone: vi.fn(() => {
+    sessionFixture.activeZone =
+      sessionFixture.activeZone >= ZONE_COUNT ? 1 : sessionFixture.activeZone + 1
   }),
 }))
 
@@ -78,6 +83,7 @@ describe('SessionPage', () => {
     mockSpeak.mockClear()
     sessionFixture.phase = 'before'
     sessionFixture.setPhase.mockClear()
+    sessionFixture.advanceZone.mockClear()
     cameraFixture.setDetectionState.mockClear()
     cameraFixture.setBrushVelocitySmoothed.mockClear()
     cameraFixture.detectionState = 'BRUSHING'
@@ -115,6 +121,22 @@ describe('SessionPage', () => {
       await Promise.resolve()
     })
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('en phase during, appelle advanceZone à intervalle ZONE_DURATION_MS (placeholder avant story 3.5)', async () => {
+    vi.useFakeTimers()
+    cameraFixture.sessionStream = null
+    sessionFixture.phase = 'during'
+    render(<SessionPage />)
+    await act(async () => {
+      vi.advanceTimersByTime(ZONE_DURATION_MS)
+    })
+    expect(sessionFixture.advanceZone).toHaveBeenCalledTimes(1)
+    await act(async () => {
+      vi.advanceTimersByTime(ZONE_DURATION_MS)
+    })
+    expect(sessionFixture.advanceZone).toHaveBeenCalledTimes(2)
+    vi.useRealTimers()
   })
 
   it('déclenche la narration placeholder une fois par flux présent', async () => {

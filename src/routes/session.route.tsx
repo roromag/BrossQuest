@@ -8,6 +8,7 @@ import { NebulaCanvas } from '../components/session/NebulaCanvas'
 import { speakPhaseBeforeNarration } from '../lib/speech/phaseBeforeNarration'
 import { useCameraStore } from '../stores/useCameraStore'
 import { useProfileStore } from '../stores/useProfileStore'
+import { ZONE_DURATION_MS } from '../lib/session/zones'
 import { useSessionStore } from '../stores/useSessionStore'
 
 export function SessionPage() {
@@ -48,6 +49,15 @@ export function SessionPage() {
     const firstName = useProfileStore.getState().profile?.firstName
     speakPhaseBeforeNarration(firstName)
   }, [sessionStream])
+
+  /** Placeholder Story 3.4 : sans ça `activeZone` ne change jamais et la nébuleuse ne dérive pas entre les 8 cibles. Remplacer en 3.5 par progression réelle. */
+  useEffect(() => {
+    if (phase !== 'during') return
+    const id = globalThis.setInterval(() => {
+      useSessionStore.getState().advanceZone()
+    }, ZONE_DURATION_MS)
+    return () => globalThis.clearInterval(id)
+  }, [phase])
 
   useEffect(() => {
     if (!sessionStream) return

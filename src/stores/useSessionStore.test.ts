@@ -24,6 +24,14 @@ describe('useSessionStore', () => {
     expect(useSessionStore.getState().activeZone).toBe(5)
   })
 
+  it('advanceZone incrémente et repasse à 1 après la zone 8', () => {
+    useSessionStore.getState().setActiveZone(7)
+    useSessionStore.getState().advanceZone()
+    expect(useSessionStore.getState().activeZone).toBe(8)
+    useSessionStore.getState().advanceZone()
+    expect(useSessionStore.getState().activeZone).toBe(1)
+  })
+
   it('updateZoneProgress accumule les secondes', () => {
     useSessionStore.getState().updateZoneProgress(2, 30)
     useSessionStore.getState().updateZoneProgress(3, 45)

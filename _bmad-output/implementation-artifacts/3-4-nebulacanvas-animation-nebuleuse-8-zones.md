@@ -3,7 +3,7 @@
 **Epic :** 3 — Session technique complète — moteur détection, nébuleuse & pipeline Avant/Pendant/Après  
 **Story ID :** 3.4  
 **Story Key :** `3-4-nebulacanvas-animation-nebuleuse-8-zones`  
-**Status :** review  
+**Status :** done  
 **Date :** 2026-04-02
 
 _Note : analyse contexte « ultimate story » terminée — guide d’implémentation pour l’agent dev._
@@ -24,7 +24,7 @@ La Story 3.3 a livré `NebulaCanvas` comme **placeholder** statique (`bg-[#0a181
 
 **Périmètre voisin :**
 
-- **Story 3.5** câble MediaPipe → progression temps / `advanceZone` / timer DEBOUNCING réel. En 3.4, les champs Zustand doivent être **lisibles** par le canvas et **initialisés** de façon cohérente à l’entrée en phase `during` ; la logique complète des transitions peut rester minimale côté détecteur tant que les **comportements visuels** des AC sont testables (mocks / setters de store).
+- **Story 3.5** câble MediaPipe → progression temps réel sur `zoneProgress[activeZone]` → appel à `advanceZone()` quand le seuil est atteint, plus timer DEBOUNCING réel. En 3.4, les champs Zustand doivent être **lisibles** par le canvas et **initialisés** de façon cohérente à l’entrée en phase `during` ; la logique complète des transitions peut rester minimale côté détecteur tant que les **comportements visuels** des AC sont testables (mocks / setters de store). **Complément documenté en Dev Notes :** sans mécanisme qui fait **changer** `activeZone`, la dérive **entre les 8 positions** du canvas n’est pas observable — d’où un **placeholder** timer session (voir section dédiée).
 - **Story 3.6** : micro-événement inattention (teinte `#F6AD55` 800 ms) — **hors scope 3.4**.
 - **Story 3.6** : `HandLostOverlay` — **hors scope 3.4** ; en 3.4, seul le **gel** du canvas sur `HAND_LOST` est exigé.
 
@@ -36,7 +36,7 @@ La Story 3.3 a livré `NebulaCanvas` comme **placeholder** statique (`bg-[#0a181
 
 **Given** la phase `'during'` active et `NebulaCanvas` rendu plein écran  
 **When** `activeZone` change (1–8)  
-**Then** la nébuleuse dérive organiquement vers la position spatiale correspondante en ~3s  
+**Then** la nébuleuse dérive organiquement vers la position spatiale correspondante en ~3s *(le centre du nuage interpole vers la cible de zone ; le mouvement « local » des particules autour du centre est piloté par un cycle interne — voir Dev Notes pour la distinction et ce qui déclenche le changement de zone en prod)*  
 **And** zones avant (1, 3, 5, 7) : nébuleuse étendue, couleur `#48BB78`, particules rapides et légères  
 **And** zones arrière (2, 4, 6, 8) : nébuleuse contractée, couleur `#2D6A4F`, particules lentes et denses  
 **And** `NebulaCanvas` lit `activeZone`, `velocity` et `detectionState` via sélecteurs Zustand fins — jamais le store entier  
@@ -63,6 +63,7 @@ La Story 3.3 a livré `NebulaCanvas` comme **placeholder** statique (`bg-[#0a181
 - [x] T2 — Données Zustand pour le canvas
   - [x] Exposer une **vélocité scalaire** lisible par le canvas (ex. `brushVelocitySmoothed` dérivée de `VelocityData.smoothed` ou équivalent) dans `useCameraStore`, mise à jour en 3.5 depuis MediaPipe ; en 3.4 : valeur par défaut cohérente à l’entrée en `during` + possibilité de tests.
   - [x] À la transition vers `phase === 'during'` (ex. après `CameraFade`), initialiser `detectionState` à `BRUSHING` (et vélocité par défaut) pour une animation « normale » jusqu’au branchement complet 3.5.
+  - [x] Exposer `advanceZone()` sur `useSessionStore` et documenter le **placeholder** de progression (timer `ZONE_DURATION_MS` en phase `during`) pour que `activeZone` change en usage réel jusqu’à la story 3.5 ; tests associés (`useSessionStore`, `session.route`).
 
 - [x] T3 — Implémenter `NebulaCanvas` (canvas + rAF)
   - [x] Remplacer le `<div>` placeholder par `<canvas>` plein écran dans le conteneur session existant.
@@ -76,6 +77,13 @@ La Story 3.3 a livré `NebulaCanvas` comme **placeholder** statique (`bg-[#0a181
   - [x] Étendre `NebulaCanvas.test.tsx` : présence canvas, props d’accessibilité, tests de comportement avec **mocks Zustand** ou wrappers (changement `activeZone` / `detectionState`) sans dépendre de MediaPipe.
   - [x] Ajuster / ajouter tests store ou types si migration `DetectionState`.
   - [x] `npm test` et `npm run build` verts.
+
+### Review Findings
+
+- [x] [Review][Patch] Fichier `src/lib/session/zones.ts` absent du dépôt (non versionné) — risque de build/CI incomplet pour les autres clones ; à inclure dans le commit avec le reste de la story 3.4. [src/lib/session/zones.ts] — corrigé 2026-04-04 (`git add`)
+- [x] [Review][Patch] Le mock `advanceZone` dans les tests session utilise le littéral `8` au lieu de `ZONE_COUNT` importé depuis `zones.ts`, ce qui peut diverger si la constante évolue. [src/routes/session.route.test.tsx:16] — corrigé 2026-04-04
+- [x] [Review][Defer] Le même diff modifie `sprint-status.yaml` pour passer la story 3-3 en `done` — vérifier côté processus que cette clôture est bien actée indépendamment de la revue 3.4. [_bmad-output/implementation-artifacts/sprint-status.yaml] — deferred, pre-existing (processus)
+- [x] [Review][Defer] AC NFR-P4 (≥ 30 fps sur iPhone SE 2) : pas de mesure ou garde-fou automatisé dans le code / les tests ; reste à valider sur appareil ou outillage perf ultérieur. [AC scénario 1 / NFR-P4] — deferred, pre-existing
 
 ---
 
@@ -94,6 +102,32 @@ La Story 3.3 a livré `NebulaCanvas` comme **placeholder** statique (`bg-[#0a181
 - Avant : zones **1, 3, 5, 7** — étendu, particules rapides/légères.  
 - Arrière : zones **2, 4, 6, 8** — contracté, particules lentes/denses.
 
+### Progression `activeZone` — dérive spatiale, animation locale, placeholder 3.4 / retrait 3.5
+
+**Comportement du canvas (`NebulaCanvas`)**
+
+- **Dérive entre les 8 positions** : déclenchée **uniquement** quand la valeur Zustand `activeZone` (1–8) **change**. Le code interpole le centre du nuage sur ~3 s (`ZONE_DRIFT_MS`) depuis la position courante vers `ZONE_CENTERS[activeZone - 1]`.
+- **Mouvement organique sans changement de zone** : un temps de cycle interne (`cycleT`) fait évoluer angles / wobble des particules autour du centre **tant que** l’animation n’est pas gelée ou arrêtée par la machine d’états (`BRUSHING` vs `DEBOUNCING` / `PAUSED` / `HAND_LOST`). Ce mouvement est plus subtil que le déplacement du centre entre zones.
+
+**Piège de diagnostic observé en recette**
+
+- Si **`activeZone` reste fixe** (ex. toujours `1`), le **centre** de la nébuleuse ne traverse pas les 8 cibles : l’utilisateur peut avoir l’impression que la nébuleuse est « immobile » même si les particules bougent légèrement.
+- Si **`detectionState === 'HAND_LOST'`** (valeur initiale du store caméra avant toute mise à jour), le canvas **ne met plus à jour** position ni `cycleT` : affichage entièrement figé jusqu’à reprise d’un état non gelé. En flux nominal session, après `CameraFade`, la session force `BRUSHING` à l’entrée en `during`.
+
+**Placeholder Story 3.4 (à remplacer en 3.5)**
+
+- Avant branchement MediaPipe / `zoneProgress`, **aucun** autre module n’appelait `setActiveZone` : la dérive inter-zones n’était pas observable en usage normal.
+- **Implémentation actuelle :**
+  - Constante **`ZONE_DURATION_MS`** (= 15 000 ms, alignée epic ~15 s par zone) dans `src/lib/session/zones.ts`, avec **`ZONE_COUNT`** (= 8).
+  - Méthode store **`advanceZone()`** : passe de la zone `n` à `n + 1`, avec boucle `8 → 1`.
+  - Dans **`session.route.tsx`**, en **`phase === 'during'`** uniquement : `setInterval` qui appelle `useSessionStore.getState().advanceZone()` tous les `ZONE_DURATION_MS`. Commentaire explicite dans le code : remplacement prévu en **story 3.5** par la progression réelle (temps de brossage effectif sur la zone courante, pas l’horloge murale seule).
+- **Story 3.5 (travail attendu)** : supprimer ou désactiver ce timer ; déclencher `advanceZone()` (ou équivalent) lorsque `zoneProgress[activeZone]` atteint le seuil produit ; conserver `NebulaCanvas` inchangé sur le principe « réaction au changement de `activeZone` ».
+
+**Tests / QA**
+
+- Tests Vitest : `advanceZone` sur le store ; en phase `during`, l’intervalle déclenche `advanceZone` au bon rythme (`session.route.test.tsx`).
+- Pour valider visuellement plus vite : réduire temporairement **`ZONE_DURATION_MS`** en développement (non recommandé en prod sans décision produit).
+
 ### Migration `DetectionState` (spike → produit)
 
 Le code actuel utilise `brushing-active` | `pause` | `absent` dans `src/lib/mediapipe/types.ts`. Les AC epic et `architecture.md` exigent `BRUSHING` | `DEBOUNCING` | `PAUSED` | `HAND_LOST`.  
@@ -110,8 +144,8 @@ Le code actuel utilise `brushing-active` | `pause` | `absent` dans `src/lib/medi
 
 ### Intelligence Story 3.3 (continuité)
 
-- `NebulaCanvas` est monté sous `session.route.tsx` lorsque `phase === 'during'` ; `CameraFade` laisse un fond cohérent avant transition — conserver l’enveloppe layout (plein écran, safe areas).
-- Fichiers touchés récemment : `session.route.tsx`, `CameraFade.tsx`, `NebulaCanvas.tsx`, `useSessionStore.ts`, `useCameraStore.ts`, `home.launch-session.ts`.
+- `NebulaCanvas` est monté sous `session.route.tsx` lorsque `phase === 'during'` ; `CameraFade` laisse un fond cohérent avant transition — conserver l’enveloppe layout (plein écran, safe areas). En `during`, la route peut aussi héberger la **progression placeholder** des zones (`advanceZone` / `ZONE_DURATION_MS`) jusqu’à la story 3.5.
+- Fichiers touchés récemment : `session.route.tsx`, `CameraFade.tsx`, `NebulaCanvas.tsx`, `useSessionStore.ts`, `useCameraStore.ts`, `home.launch-session.ts`, `lib/session/zones.ts`.
 - Redirection `/recovery/camera` si pas de stream **sauf** phases `during` / `after` — ne pas régresser ce comportement.
 
 ### Structure fichiers (architecture)
@@ -120,7 +154,8 @@ Le code actuel utilise `brushing-active` | `pause` | `absent` dans `src/lib/medi
 
 - `src/components/session/NebulaCanvas.tsx` + `NebulaCanvas.test.tsx`
 - `src/stores/useCameraStore.ts` (+ tests)
-- `src/stores/useSessionStore.ts` — `activeZone` déjà présent
+- `src/stores/useSessionStore.ts` — `activeZone`, `advanceZone()` ; tests store
+- `src/lib/session/zones.ts` — `ZONE_COUNT`, `ZONE_DURATION_MS` (placeholder progression jusqu’à 3.5)
 - `src/lib/mediapipe/types.ts`, `detector.ts`, `detector.test.ts`
 - `src/routes/spike.route.tsx` si couleurs / états affichés selon ancien enum
 
@@ -150,7 +185,7 @@ Cursor agent (implémentation guidée workflow dev-story).
 
 ### Debug Log References
 
-_(aucun)_
+- Symptôme « nébuleuse visible mais centre immobile » : causé par l’absence de changement de `activeZone` ; documenté dans **Dev Notes — Progression `activeZone`** et corrigé côté produit par placeholder timer + `advanceZone()` (voir Change Log 2026-04-04).
 
 ### Completion Notes List
 
@@ -158,6 +193,7 @@ _(aucun)_
 - Migration `DetectionState` : détecteur émet `BRUSHING` / `DEBOUNCING` / `HAND_LOST` ; `PAUSED` réservé à la logique timer 3.5.
 - `NebulaCanvas` : canvas + rAF, `getState` uniquement (pas de hook store dans la boucle), 8 cibles ~3 s, avant/arrière UX, blends pause/reprise via `BRUSHING_CONFIG`, gel sur `HAND_LOST`, `touch-none` sans handlers pointer.
 - jsdom : stub `getContext('2d')` dans `test-setup.ts` pour les tests canvas.
+- Progression zones : `advanceZone()` + `ZONE_DURATION_MS` + intervalle phase `during` dans `session.route.tsx` pour rendre la dérive spatiale observable avant la story 3.5 (remplacement prévu par `zoneProgress` + détection).
 
 ### File List
 
@@ -169,8 +205,10 @@ _(aucun)_
 - `src/stores/useCameraStore.test.ts`
 - `src/routes/home.route.tsx`
 - `src/routes/home.route.test.tsx`
-- `src/routes/session.route.tsx`
+- `src/routes/session.route.tsx` (intervalle `advanceZone` en `during`)
 - `src/routes/session.route.test.tsx`
+- `src/lib/session/zones.ts`
+- `src/stores/useSessionStore.ts` (+ `useSessionStore.test.ts` — `advanceZone`)
 - `src/routes/spike.route.tsx`
 - `src/components/session/NebulaCanvas.tsx`
 - `src/components/session/NebulaCanvas.test.tsx`
@@ -178,11 +216,12 @@ _(aucun)_
 
 ### Change Log
 
+- 2026-04-04 — Spec & impl. : documentation de la dépendance `activeZone` → dérive spatiale ; `advanceZone()`, `src/lib/session/zones.ts`, timer placeholder en phase `during` (`session.route.tsx`) ; tests store + session ; spec story mise à jour (section Dev Notes dédiée).
 - 2026-04-02 — Story 3.4 : nébuleuse canvas 8 zones, config brossage, migration états détection, init session `during`, tests et stub canvas jsdom.
 
 ---
 
 ## Story completion status
 
-**Statut :** review  
-**Note :** Implémentation complète — prête pour code review (idéalement autre LLM).
+**Statut :** done  
+**Note :** Code review 2026-04-04 — patchs review appliqués ; items defer consignés dans `deferred-work.md`.
